@@ -1,0 +1,49 @@
+/* Hintergrund: Hörsaal (aus public/img) */
+.bg {
+  min-height: calc(100vh - 56px);
+  background-size: cover;
+  background-position: center;
+}
+.bg--saal { background-image: url('/img/Klassenzimmer.png'); }
+
+/* Layout */
+.page-shell { display: grid; place-items: center; padding: 2rem; }
+.card {
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: .6rem;
+  padding: 1.25rem 1.5rem;
+  color: #fff;
+  max-width: 900px;
+  width: min(900px, 94vw);
+}
+.question {
+  font-size: clamp(1.1rem, 1.2vw + .6rem, 1.35rem);
+  margin: .25rem 0 1rem;
+}
+.grid {
+  margin-top: .25rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+}
+.btn {
+  padding: .75rem 1rem;
+  border-radius: .5rem;
+  border: 1px solid rgba(255,255,255,.35);
+  background: rgba(0,0,0,.25);
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+.btn:hover { background: rgba(255,255,255,.08); }
+.btn:disabled { opacity: .8; cursor: default; }
+
+/* Zustände */
+.btn.chosen { outline: 2px solid rgba(255,255,255,.6); }
+.btn.correct { border-color: #b7ffb7; background: rgba(0,255,128,.12); }
+.btn.wrong { border-color: #ffb4b4; background: rgba(255,0,0,.12); }
+
+.feedback { margin: .75rem 0; min-height: 1.5rem; }
+.row { display: flex; gap: .75rem; margin-top: .5rem; }
+.btn.primary { border-color:#c8ffd0; background: rgba(0,255,128,.12); }

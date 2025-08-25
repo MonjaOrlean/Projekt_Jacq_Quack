@@ -1,1 +1,54 @@
-<p>quiz works!</p>
+<div class="bg bg--saal">
+  <div class="page-shell">
+    <div class="card">
+      <!-- Lade-/Fehlerstatus -->
+      <ng-container *ngIf="loading; else loaded">
+        <h2>Quiz</h2>
+        <p>Lade Fragen…</p>
+      </ng-container>
+
+      <ng-template #loaded>
+        <ng-container *ngIf="!error && q as Q; else errorTpl">
+          <div class="row space-between">
+            <h2>Quiz</h2>
+            <div class="progress" aria-live="polite">{{ progressLabel }}</div>
+          </div>
+
+          <p class="question">{{ Q.text }}</p>
+
+          <div class="grid">
+            <button
+              class="btn"
+              *ngFor="let a of Q.answers; let i = index"
+              [ngClass]="{
+                chosen: selectedIndex === i,
+                correct: answered && a.correct,
+                wrong: answered && selectedIndex === i && !a.correct
+              }"
+              (click)="select(i)"
+              [disabled]="answered"
+            >
+              {{ a.text }}
+            </button>
+          </div>
+
+          <div class="feedback" *ngIf="answered">
+            <span *ngIf="isCorrect">✅ Richtig! (Heller Quack kommt später)</span>
+            <span *ngIf="!isCorrect">❌ Falsch! (Tiefer Quack kommt später)</span>
+          </div>
+
+          <div class="row">
+            <button class="btn primary" (click)="next()" [disabled]="!answered">
+              {{ (index+1) >= queue.length ? 'Ergebnis anzeigen' : 'Weiter' }}
+            </button>
+          </div>
+        </ng-container>
+      </ng-template>
+
+      <ng-template #errorTpl>
+        <h2>Quiz</h2>
+        <p class="question">Fehler: {{ error }}</p>
+      </ng-template>
+    </div>
+  </div>
+</div>

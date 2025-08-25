@@ -1,0 +1,29 @@
+/* Hintergrundbild Schule */
+.bg {
+  min-height: calc(100vh - 56px); /* unter dem Header */
+  background-size: cover;
+  background-position: center;
+  background-color: #222; /* Fallback, damit man die Fläche sicher sieht */
+}
+
+.bg--schule {
+  background-image: url('/img/Schule.png'); /* served aus public/img */
+}
+
+
+/* Layout für Inhalt */
+.page-shell {
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.card {
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: .6rem;
+  padding: 1.25rem 1.5rem;
+  color: #fff;
+  max-width: 720px;
+  width: min(720px, 94vw);
+}

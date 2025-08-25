@@ -1,1 +1,19 @@
-<p>result works!</p>
+<div class="bg bg--schule">
+  <div class="page-shell">
+    <div class="card">
+      <h2>Ergebnis</h2>
+
+      <p style="font-size:1.1rem; margin:.25rem 0 0;">
+        Deine Punktzahl:
+        <strong>{{ score }}</strong> / <strong>{{ total }}</strong>
+        (<strong>{{ percent }}%</strong>)
+      </p>
+      <p style="margin:.5rem 0 1rem;">{{ message }}</p>
+
+      <div class="row">
+        <button class="btn primary" (click)="restart()">Nochmal ballern</button>
+        <button class="btn" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>

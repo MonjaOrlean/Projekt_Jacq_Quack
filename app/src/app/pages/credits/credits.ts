@@ -2,10 +2,8 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-credits',
-  imports: [],
+  standalone: true,
   templateUrl: './credits.html',
-  styleUrl: './credits.css'
+  styleUrl: './credits.css',
 })
-export class Credits {
-
-}
+export class Credits {}

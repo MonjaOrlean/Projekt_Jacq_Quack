@@ -1,34 +1,31 @@
 import { Routes } from '@angular/router';
 
-// Wir laden die Standalone-Komponenten dynamisch, damit es keine Pfadprobleme gibt.
 export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./pages/login/login.component').then(m => m.LoginComponent),
+      import('./pages/login/login').then(m => m.Login),
   },
   {
     path: 'start',
     loadComponent: () =>
-      import('./pages/start/start.component').then(m => m.StartComponent),
+      import('./pages/start/start').then(m => m.Start),
   },
   {
     path: 'quiz',
     loadComponent: () =>
-      import('./pages/quiz/quiz.component').then(m => m.QuizComponent),
+      import('./pages/quiz/quiz').then(m => m.Quiz),
   },
   {
     path: 'result',
     loadComponent: () =>
-      import('./pages/result/result.component').then(m => m.ResultComponent),
+      import('./pages/result/result').then(m => m.Result),
   },
   {
-    path: 'credits', // Logout-Abspann
+    path: 'credits',
     loadComponent: () =>
-      import('./pages/credits/credits.component').then(m => m.CreditsComponent),
+      import('./pages/credits/credits').then(m => m.Credits),
   },
-
-  // Standard-Weiterleitungen
   { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: '**', redirectTo: 'login' },
 ];

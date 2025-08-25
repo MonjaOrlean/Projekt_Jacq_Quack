@@ -1,0 +1,67 @@
+/* Hintergrund aus public/img */
+.bg {
+  min-height: calc(100vh - 56px);
+  background-size: cover;
+  background-position: center;
+}
+.bg--kamin { background-image: url('/img/Leherzimmer.png'); }
+
+/* Abspann-Layout */
+.credits-wrap {
+  position: relative;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding-inline: 1rem;
+}
+
+/* Dunkles Overlay für bessere Lesbarkeit */
+.credits-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.65); /* bei Bedarf 0.35–0.65 anpassen */
+  z-index: 0;
+}
+
+/* rollender Text */
+.roll {
+  position: relative;
+  z-index: 1;
+  width: min(70ch, 90vw);
+  color: #F5F7FA; /* hellere Schrift */
+  text-shadow: 0 2px 6px rgba(0,0,0,.9); /* stärkerer Schatten */
+  line-height: 1.6;
+  font-size: clamp(1rem, 1.2vw + .6rem, 1.25rem);
+  transform: translateY(100%);             /* Start: ganz unten */
+  animation: rollUp 80s linear forwards;   /* langsamer: 80s statt 45s */
+}
+
+.roll h2 {
+  text-align: center;
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+}
+
+/* Kino-Fades oben/unten */
+.fade {
+  position: absolute;
+  left: 0; right: 0; height: 14%;
+  pointer-events: none;
+  z-index: 2;
+}
+.fade.top {
+  top: 0;
+  background: linear-gradient(rgba(0,0,0,.85), transparent);
+}
+.fade.bottom {
+  bottom: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,.85));
+}
+
+/* Keyframes für den Lauftext */
+@keyframes rollUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(-120%); }
+}

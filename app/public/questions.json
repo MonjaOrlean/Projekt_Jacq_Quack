@@ -1,0 +1,72 @@
+[
+  {
+    "id": "q1",
+    "topic": "HTML",
+    "text": "Was bedeutet HTML?",
+    "answers": ["HyperText Markup Language", "High-Tech Machine Learning", "Home Tool Markup List", "Hyper Transfer Mail Link"],
+    "correct": 0
+  },
+  {
+    "id": "q2",
+    "topic": "CSS",
+    "text": "Wofür steht CSS?",
+    "answers": ["Cascading Style Sheets", "Computer Style System", "Creative Site Styles", "Color & Style Setup"],
+    "correct": 0
+  },
+  {
+    "id": "q3",
+    "topic": "Python",
+    "text": "Wie nennt man ganze Zahlen in Python?",
+    "answers": ["Integer (int)", "Float (float)", "String (str)", "Liste (list)"],
+    "correct": 0
+  },
+  {
+    "id": "q4",
+    "topic": "Python",
+    "text": "Welcher Befehl fügt einer Liste ein Element hinten an?",
+    "answers": [".append()", ".add()", ".push()", ".insert()"],
+    "correct": 0
+  },
+  {
+    "id": "q5",
+    "topic": "Python",
+    "text": "Welcher Befehl entfernt ein bestimmtes Element aus einer Liste?",
+    "answers": [".remove()", ".delete()", ".pop(0)", ".clear()"],
+    "correct": 0
+  },
+  {
+    "id": "q6",
+    "topic": "Python",
+    "text": "Welcher Datentyp steht für Wahr/Falsch?",
+    "answers": ["Boolean (bool)", "Text (str)", "Zahl (int)", "Kommazahl (float)"],
+    "correct": 0
+  },
+  {
+    "id": "q7",
+    "topic": "Python",
+    "text": "Was gibt enumerate() zurück?",
+    "answers": ["Tupel (Index, Element)", "nur die Elemente", "nur die Indizes", "eine sortierte Liste"],
+    "correct": 0
+  },
+  {
+    "id": "q8",
+    "topic": "HTML",
+    "text": "Welches Tag ist die größte Überschrift?",
+    "answers": ["<h1>", "<header>", "<h6>", "<big>"],
+    "correct": 0
+  },
+  {
+    "id": "q9",
+    "topic": "CSS",
+    "text": "Welche Eigenschaft setzt die Hintergrundfarbe?",
+    "answers": ["background-color", "color-bg", "bg-color", "background"],
+    "correct": 0
+  },
+  {
+    "id": "q10",
+    "topic": "Python",
+    "text": "Welcher Operator prüft Gleichheit?",
+    "answers": ["==", "=", "===", ":="],
+    "correct": 0
+  }
+]

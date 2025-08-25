@@ -1,1 +1,23 @@
-<p>header works!</p>
+<header class="app-header" role="banner">
+  <div class="brand" aria-label="Jacq-Quiz Start">Jacq-Quiz</div>
+
+  <div class="spacer"></div>
+
+  <button class="btn ghost" title="Easter-Egg" (click)="onDuck()">🦆</button>
+  <div class="clock" aria-live="polite">{{ time() }}</div>
+
+  <button class="btn warn" title="Quiz abbrechen" (click)="onAbort()">Abbrechen</button>
+  <button class="btn" title="Logout" (click)="onLogout()">Logout</button>
+</header>
+
+<!-- Abort-Dialog -->
+<div class="modal-backdrop" *ngIf="showAbort">
+  <div class="modal">
+    <h3>Willst du wirklich eine <em>feige Ente</em> sein und aufgeben?</h3>
+    <p class="sub">*enttäuschendes quack*</p>
+    <div class="row">
+      <button class="btn warn" (click)="confirmAbort()">Ja, aufgeben</button>
+      <button class="btn primary" (click)="keepGoing()">Nein, weiter ballern</button>
+    </div>
+  </div>
+</div>

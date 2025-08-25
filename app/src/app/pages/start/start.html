@@ -1,1 +1,20 @@
-<p>start works!</p>
+<div class="bg bg--schule">
+  <div class="page-shell">
+    <div class="card">
+      <h2>Bist du bereit, jetzt durchs Quiz zu <strong>BALLERN</strong>?</h2>
+      <div class="row">
+        <button class="btn primary" (click)="onYes()">Ja, lass uns losballern</button>
+        <button class="btn ghost" (click)="onNo()">Nein</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-backdrop" *ngIf="showEarly">
+  <div class="modal">
+    <h3>OHA, so früh!</h3>
+    <p>Der Kopf ist doch erst ab 9 Uhr arbeitsfähig 😄 — OKay dann ballern wir halt trotzdem los!</p>
+    <button class="btn primary" (click)="confirmEarly()">Alles klar!</button>
+  </div>
+</div>
