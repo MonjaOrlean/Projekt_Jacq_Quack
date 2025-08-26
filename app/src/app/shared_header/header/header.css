@@ -1,23 +1,109 @@
+/* ================================
+   Header-Bar (Jacq-Quack-Quiz)
+   ================================ */
+
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
   display: flex;
   align-items: center;
   gap: .5rem;
+
+  height: 56px;
   padding: .5rem 1rem;
-  background: rgba(0,0,0,.35);
+  width: 100%;
+  box-sizing: border-box;
+
+  /* Jacqs Lieblingsfarbe (#4f51c7) – nutzt :root-Variablen, hat aber Fallback */
+  background: var(--brand-strong, rgba(79,81,199,.85));
   color: #fff;
   backdrop-filter: blur(6px);
-  height: 56px;
-}
-.brand { font-weight: 700; letter-spacing: .4px; }
-.spacer { flex: 1; }
-.clock { min-width: 4ch; text-align: right; font-variant-numeric: tabular-nums; }
-.btn { padding: .4rem .8rem; border-radius: .4rem; border: 1px solid rgba(255,255,255,.35); background: transparent; color: #fff; cursor: pointer; }
-.btn:hover { background: rgba(255,255,255,.08); }
-.btn.warn { border-color: #ffb4b4; }
-.btn.ghost { border-color: transparent; }
-.btn.primary { border-color:#c8ffd0; background: rgba(0,255,128,.12); }
 
-/* Modal */
+  /* Grundgröße für Brand & Uhr */
+  --hdrSize: 1.9rem;
+}
+
+.brand { 
+  font-weight: 700; 
+  letter-spacing: .4px;
+  font-size: var(--hdrSize);
+  line-height: 1;
+}
+
+/* Rechtsgruppe – hält alles am rechten Rand */
+.right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+
+/* Uhr so groß wie Brand */
+.clock { 
+  min-width: 5ch;
+  text-align: right; 
+  font-variant-numeric: tabular-nums;
+  font-size: var(--hdrSize);
+  line-height: 1;
+}
+
+/* 🦆 Ente – 1.1× größer als Brand/Uhr, mit bequemer Klickfläche */
+button[title="Easter-Egg"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: calc(var(--hdrSize) * 1.1);
+  line-height: 1;
+  padding: .2rem .6rem;
+
+  min-width: 2.4rem;
+  min-height: 2.4rem;
+}
+
+/* Buttons allgemein */
+.btn { 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: .4rem .8rem; 
+  border-radius: .4rem; 
+  border: 1px solid rgba(255,255,255,.35); 
+  background: transparent; 
+  color: #fff; 
+  cursor: pointer; 
+  text-decoration: none;
+  line-height: 1.1;
+}
+
+.btn:hover { background: rgba(255,255,255,.08); }
+
+/* Buttons rechts: Höhe optisch an Uhr/🦆 angleichen */
+.right .btn {
+  font-size: 1.1rem;
+  min-height: calc(var(--hdrSize) + .4rem);
+  padding: .3rem 1rem;
+}
+
+/* Primärfarbe dezent einbinden */
+.btn.primary { 
+  border-color: rgba(255,255,255,.65); 
+  background: var(--brand-ghost, rgba(79,81,199,.18));
+}
+.btn.primary:hover { 
+  background: var(--brand-hover, rgba(79,81,199,.28)); 
+}
+
+.btn.warn  { border-color: #ffb4b4; }
+.btn.ghost { border-color: transparent; }
+
+/* ================================
+   Modal (Abbrechen-Dialog)
+   ================================ */
+
 .modal-backdrop{
   position: fixed; inset: 0;
   background: rgba(0,0,0,.65);
@@ -36,3 +122,29 @@
 .modal h3 { margin: .25rem 0 .5rem; }
 .modal .sub { opacity: .8; margin: 0 0 .75rem; }
 .row { display: flex; gap: .75rem; justify-content: center; margin-top: .5rem; }
+
+/* ================================
+   🦆 Tipp-Overlay (Rubber-Duck)
+   ================================ */
+
+.tip-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.35);
+  display: grid; place-items: center;
+  z-index: 1300;
+}
+.duck-tip{
+  background: rgba(0,0,0,.90);
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: .6rem;
+  padding: 1rem 1.25rem;
+  color: #fff; text-align: left;
+  width: min(520px, 92vw);
+  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+.duck-tip .tip-head{
+  font-weight: 700; margin-bottom: .5rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.duck-tip .tip-head::before{ content: "🦆"; }
+.duck-tip .tip-text{ margin: 0 0 .75rem 0; line-height: 1.5; }

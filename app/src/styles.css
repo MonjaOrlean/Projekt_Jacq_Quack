@@ -1,1 +1,7 @@
+:root{
+  --brand: #4f51c7;         /* Jacqs Lieblingsfarbe */
+  --brand-ghost: rgba(79,81,199,.18);
+  --brand-hover: rgba(79,81,199,.28);
+  --brand-strong: rgba(79,81,199,.85);
+}
 /* You can add global styles to this file, and also import other style files */

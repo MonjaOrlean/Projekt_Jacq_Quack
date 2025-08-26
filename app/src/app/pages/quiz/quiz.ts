@@ -29,7 +29,21 @@ export class Quiz implements OnInit {
   selectedIndex: number | null = null;
   isCorrect: boolean | null = null;
 
+  // === Sounds ===
+  private sOk?: HTMLAudioElement;   // /audio/ente_happy.mp3
+  private sNo?: HTMLAudioElement;   // /audio/ente_angry.mp3
+
   async ngOnInit() {
+    // Sounds vorbereiten (werden beim ersten Klick sicher gespielt)
+    try {
+      this.sOk = new Audio('/audio/ente_happy.mp3');
+      this.sOk.volume = 0.7;
+      this.sOk.preload = 'auto';
+      this.sNo = new Audio('/audio/ente_angry.mp3');
+      this.sNo.volume = 0.7;
+      this.sNo.preload = 'auto';
+    } catch {}
+
     await this.loadAll();
     this.startRound();
     this.showCurrent();
@@ -52,7 +66,6 @@ export class Quiz implements OnInit {
   }
 
   private startRound() {
-    // shuffle (Fisher–Yates)
     const arr = [...this.all];
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -68,13 +81,12 @@ export class Quiz implements OnInit {
     const item = this.queue[this.index];
     if (!item) { this.finish(); return; }
 
-    // Antworten als Objekte (korrekt markieren)
     const answers: ViewAns[] = item.answers.map((t, i) => ({
       text: String(t),
       correct: i === item.correct
     }));
 
-    // Optional: Antworten für jede Frage neu mischen (Layout-Variante)
+    // Antworten mischen (optional)
     for (let i = answers.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [answers[i], answers[j]] = [answers[j], answers[i]];
@@ -93,6 +105,9 @@ export class Quiz implements OnInit {
     const ok = this.q.answers[i].correct;
     this.isCorrect = ok;
     if (ok) this.score++;
+
+    // Sound abspielen (User-Klick -> erlaubt)
+    this.play(ok ? this.sOk : this.sNo);
   }
 
   next() {
@@ -106,13 +121,19 @@ export class Quiz implements OnInit {
   }
 
   private finish() {
-    // Ergebnis für /result ablegen (lesen wir im nächsten Schritt dort aus)
     sessionStorage.setItem('quiz_score', String(this.score));
     sessionStorage.setItem('quiz_total', String(this.queue.length));
     this.router.navigateByUrl('/result');
   }
 
-  // Anzeige-Helfer
+  private play(a?: HTMLAudioElement) {
+    try {
+      if (!a) return;
+      a.currentTime = 0;
+      a.play().catch(() => {});
+    } catch {}
+  }
+
   get progressLabel() {
     return `${Math.min(this.index+1, this.queue.length)} / ${this.queue.length}`;
   }
