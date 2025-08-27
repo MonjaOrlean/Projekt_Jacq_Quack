@@ -1,20 +1,46 @@
-<div class="bg bg--schule">
-  <div class="page-shell">
+<div class="page">
+  <div class="shell">
     <div class="card">
-      <h2>Bist du bereit, jetzt durchs Quiz zu <strong>BALLERN</strong>?</h2>
-      <div class="row">
-        <button class="btn primary" (click)="onYes()">Ja, lass uns losballern</button>
-        <button class="btn ghost" (click)="onNo()">Nein</button>
+      <h2>Bist du bereit, hier jetzt und sofort durchs Quiz zu <span class="ballern">BALLERN</span>?</h2>
+
+      <div class="early" *ngIf="earlyWarn">
+        <div class="early-title">OHA, so früh!</div>
+        <p>Der Kopf ist doch erst ab <strong>9:00 Uhr</strong> arbeitsfähig 😴☕</p>
+        <button class="btn primary" (click)="dismissEarlyWarn()">Alles klar</button>
+      </div>
+
+      <div class="actions">
+        <a class="btn primary" routerLink="/quiz">Ja, lass uns losballern</a>
+        <a class="btn" routerLink="/login">Nein</a>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ===== INTRO-OVERLAY (Kaminzimmer mit freigestelltem Avatar) ===== -->
+<div class="intro-bg" *ngIf="showIntro">
+  <!-- Jacq „frei“ neben dem Kamin platzieren -->
+  <div class="jacq-stand">
+    <app-avatar #introAv class="room-avatar" [size]="clampSize(420, 26, 560)"></app-avatar>
+  </div>
 
-<div class="modal-backdrop" *ngIf="showEarly">
-  <div class="modal">
-    <h3>OHA, so früh!</h3>
-    <p>Der Kopf ist doch erst ab 9 Uhr arbeitsfähig 😄 — OKay dann ballern wir halt trotzdem los!</p>
-    <button class="btn primary" (click)="confirmEarly()">Alles klar!</button>
+  <!-- Sprech-Card rechts -->
+  <div class="speech-card" role="dialog" aria-label="Vorstellung von Jacq">
+    <h3>Hallo zusammen!</h3>
+    <p class="intro-text">
+      Mein Name ist <strong class="JacquesLöhr">Jacques Löhr</strong>.
+      Für viele bin ich auch bekannt als <strong class="coderpuppe">Jacques die Coder-Puppe</strong> 
+      Ich bin Dozent für deinen Programmierunterricht.
+    </p>
+    <p class="intro-text">
+      Bist du bereit, hier jetzt und sofort durchs Quiz zu <strong class="ballern">BALLERN</strong>?
+    </p>
+
+    <div class="intro-actions">
+      <button class="btn primary" (click)="closeIntro()">Klar, weiter!</button>
+      <button class="btn" *ngIf="ttsAvailable && ttsBlocked" (click)="speakIntroManual()">🔊 Vorlesen</button>
+    </div>
+
+    <p class="no-sound-note" *ngIf="ttsAvailable">(* Wird automatisch vorgelesen – falls blockiert, „🔊 Vorlesen“ klicken.)</p>
   </div>
 </div>
