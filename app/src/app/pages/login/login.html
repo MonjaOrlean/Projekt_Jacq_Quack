@@ -1,25 +1,23 @@
-<div class="bg bg--schule">
-  <div class="page-shell">
-    <div class="card">
-      <h1>Willkommen</h1>
-      <p>Dies ist ein Platzhalter-Login. Klicke auf „Anmelden“, um zu starten.</p>
+<div class="page">
+  <div class="login-card">
+    <h1>
+      Willkommen in der<br />
+      <span class="school">Coding-Schule-Orlean</span>
+    </h1>
 
-      <div style="display:grid; gap:.5rem; margin-top:.75rem;">
-        <label>
-          Benutzername
-          <input type="text" placeholder="z. B. Monja" style="width:100%; padding:.5rem; border-radius:.4rem; border:1px solid rgba(255,255,255,.3); background:rgba(0,0,0,.25); color:#fff;">
-        </label>
-        <label>
-          Passwort
-          <input type="password" placeholder="••••••" style="width:100%; padding:.5rem; border-radius:.4rem; border:1px solid rgba(255,255,255,.3); background:rgba(0,0,0,.25); color:#fff;">
-        </label>
-      </div>
+    <label>Benutzername</label>
+    <div class="input-wrap">
+      <input [(ngModel)]="username" type="text" placeholder="z. B. Monja" />
+    </div>
 
-      <!-- einfacher Link statt routerLink, damit wir keine TS/Imports ändern müssen -->
-      <a href="/start"
-         style="display:inline-block; margin-top:1rem; padding:.6rem 1rem; border-radius:.5rem; border:1px solid rgba(200,255,208,.8); background:rgba(0,255,128,.12); color:#fff; text-decoration:none; cursor:pointer;">
-        Anmelden
-      </a>
+    <label>Passwort</label>
+    <div class="input-wrap">
+      <input [(ngModel)]="password" [type]="showPw ? 'text' : 'password'" placeholder="••••••" />
+      <button class="pw-toggle" type="button" (click)="showPw = !showPw" title="Passwort ein-/ausblenden">👁️</button>
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="button" (click)="doLogin()">Login</button>
     </div>
   </div>
 </div>

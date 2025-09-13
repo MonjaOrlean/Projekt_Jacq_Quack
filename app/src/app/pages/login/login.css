@@ -1,29 +1,94 @@
-/* Hintergrundbild Schule */
-.bg {
-  min-height: calc(100vh - 56px); /* unter dem Header */
-  background-size: cover;
-  background-position: center;
-  background-color: #222; /* Fallback, damit man die Fläche sicher sieht */
+/* ===== Vollbild ohne Scrollbar und Hintergrund ===== */
+:host, .page {
+  position: relative;
+  display: block;
+  height: calc(100vh - 64px);
+  width: 100vw;              /* <- ergänzen für volle Breite */
+  overflow: hidden;
+  background: url('/img/Schule.png') center / cover no-repeat fixed;
 }
 
-.bg--schule {
-  background-image: url('/img/Schule.png'); /* served aus public/img */
+
+/* --- Zielposition über Variablen (fein justierbar) --- 
+   • --login-bottom: wie weit vom unteren Rand
+   • --login-left-shift: nach links (<0) / rechts (>0) schieben
+*/
+
+/* ===== Login-Karte (Glas-Optik, feste Position) ===== */
+.login-card {
+  position: fixed !important;
+  left: 38.3%;
+  bottom: var(--login-bottom);
+  transform: translate(calc(-50% + var(--login-left-shift)), 0);
+
+  width: min(var(--login-width), 92vw);
+  padding: 22px;
+  border-radius: 14px;
+
+  background: rgba(10, 10, 20, 0.10);        /* sehr transparent */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 10px 35px rgba(0,0,0,0.35);
 }
 
-
-/* Layout für Inhalt */
-.page-shell {
-  display: grid;
-  place-items: center;
-  padding: 2rem;
-}
-
-.card {
-  background: rgba(0,0,0,.45);
-  border: 1px solid rgba(255,255,255,.25);
-  border-radius: .6rem;
-  padding: 1.25rem 1.5rem;
+/* ===== Überschrift ===== */
+.login-card h1 {
+  margin: 0 0 14px;
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.2;
   color: #fff;
-  max-width: 720px;
-  width: min(720px, 94vw);
+  text-align: center;
+}
+.login-card h1 .school { color: #cfd3ff; }
+
+/* ===== Felder ===== */
+label {
+  display: block;
+  margin: 8px 0 6px;
+  color: #e9ecff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.input-wrap { position: relative; margin-bottom: 8px; }
+
+input[type='text'],
+input[type='password'],
+input[type='email'] {
+  width: 100%;
+  box-sizing: border-box;
+  height: 34px;
+  padding: 0 42px 0 10px;              /* Platz für das Auge */
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 0.92rem;
+  outline: none;
+}
+input::placeholder { color: rgba(255,255,255,0.65); }
+
+/* Passwort-Auge */
+.pw-toggle {
+  position: absolute;
+  top: 50%; right: 8px;
+  transform: translateY(-50%);
+  height: 28px; min-width: 34px;
+  border: 0; border-radius: 6px;
+  background: rgba(255,255,255,0.14);
+  color: #fff; cursor: pointer;
+}
+.pw-toggle:hover { background: rgba(255,255,255,0.22); }
+
+/* ===== Aktionen ===== */
+.actions { margin-top: 12px; display: flex; justify-content: center; }
+.btn {
+  border: 0; background: #4f51c7; color: #fff;
+  padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(79,81,199,0.35);
+}
+.btn:hover { filter: brightness(1.06); }
+
+/* ===== Responsive Fallback ===== */
+@media (max-width: 700px) {
+  :root { --login-width: 360px; --login-left-shift: -40px; --login-bottom: 24vh; }
 }

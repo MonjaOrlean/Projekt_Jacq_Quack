@@ -1,7 +1,30 @@
 :root{
-  --brand: #4f51c7;         /* Jacqs Lieblingsfarbe */
+  /* Jacqs Markenfarben – unbedingt behalten */
+  --brand: #4f51c7;
   --brand-ghost: rgba(79,81,199,.18);
   --brand-hover: rgba(79,81,199,.28);
   --brand-strong: rgba(79,81,199,.85);
 }
-/* You can add global styles to this file, and also import other style files */
+
+/* ===== Global Reset: kein weißer Rand, keine horizontale Scrollbar ===== */
+html, body {
+  height: 100%;
+  margin: 0;             /* weißen Standardrand entfernen */
+  padding: 0;
+  overflow-x: hidden;    /* keine horizontale Scrollbar */
+  background: #000;      /* falls ein Bild fehlt, kein weißes Blitzen */
+}
+
+/* Stabiles Box-Sizing überall */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Wird von der Login-Seite per Renderer gesetzt/entfernt */
+body.no-scroll { overflow: hidden; }
+
+/* (Optional) kleine Helfer auf Basis deiner Variablen */
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: var(--brand-strong); }
+.text-brand { color: var(--brand); }
+.bg-brand { background: var(--brand); }
+
+/* Du kannst weitere globale Styles hinzufügen oder andere Dateien importieren */

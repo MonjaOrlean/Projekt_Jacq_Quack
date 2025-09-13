@@ -1,35 +1,18 @@
-<header class="app-header" role="banner">
-  <div class="brand" aria-label="Jacq-Quack-Quiz Start">Jacq-Quack-Quiz</div>
+<header class="bar" [class.solid]="onLogin" [class.glass]="!onLogin">
+  <div class="brand">Jacq-Quack-Quiz</div>
 
+  <div class="spacer"></div>
 
   <div class="right">
-    <!-- 🦆 Easter-Egg -->
-    <button class="btn ghost" title="Easter-Egg" (click)="onDuck()">🦆</button>
+    <span class="time">{{ time }}</span>
 
-    <div class="clock" aria-live="polite">{{ time() }}</div>
-
-    <button class="btn warn" title="Quiz abbrechen" (click)="onAbort()">Abbrechen</button>
-    <button class="btn" title="Logout" (click)="onLogout()">Logout</button>
+    @if (onLogin) {
+      <!-- Auf Login-Seite: nur Registrieren rechts -->
+      <a class="btn" href="/login#register">Registrieren</a>
+    } @else {
+      <!-- Auf allen anderen Seiten: Abbrechen / Logout (wie zuvor) -->
+      <a class="btn" routerLink="/login">Abbrechen</a>
+      <a class="btn outline" routerLink="/login">Logout</a>
+    }
   </div>
 </header>
-
-<!-- 🦆 Tipp-Overlay (Rubber-Duck-Debugging) -->
-<div class="tip-backdrop" *ngIf="showDuckTip" (click)="closeDuckTip()">
-  <div class="duck-tip" role="dialog" aria-label="Rubber-Duck-Debugging Tipp" (click)="$event.stopPropagation()">
-    <div class="tip-head">Rubber-Duck-Debugging</div>
-    <p class="tip-text">{{ duckTipText }}</p>
-    <button class="btn primary" (click)="closeDuckTip()">Alles klar</button>
-  </div>
-</div>
-
-<!-- Abbrechen-Dialog -->
-<div class="modal-backdrop" *ngIf="showAbort">
-  <div class="modal">
-    <h3>Willst du wirklich eine <em>feige Ente</em> sein und aufgeben?</h3>
-    <p class="sub">*enttäuschendes quack*</p>
-    <div class="row">
-      <button class="btn warn" (click)="confirmAbort()">Ja, aufgeben</button>
-      <button class="btn primary" (click)="keepGoing()">Nein, weiter ballern</button>
-    </div>
-  </div>
-</div>

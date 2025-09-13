@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Header } from './shared_header/header/header'; // ← WICHTIG: Pfad mit shared_header/header/header
+import { Header } from './shared_header/header/header';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +9,6 @@ import { Header } from './shared_header/header/header'; // ← WICHTIG: Pfad mit
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {}
+export class App {
+  title = signal('app');
+}
