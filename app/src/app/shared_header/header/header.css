@@ -1,72 +1,82 @@
+:host {
+  display: block;
+}
+
+/* Grundlayout */
 .bar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
   position: sticky;
   top: 0;
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 20px;
-  height: 64px;
-  box-sizing: border-box;
   color: #fff;
 }
 
-/* Vollfarbe (Login-Seite) */
+/* Login-Seite: halbtransparent + leichter Glas-Effekt (erzwingen) */
 .bar.solid {
-  background: rgba(79, 81, 199, 0.92); /* #4f51c7 mit leichter Transparenz */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  background: rgb(79, 81, 199) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-/* Glasig (alle anderen Seiten) */
+/* Andere Seiten: noch transparenteres Glas */
 .bar.glass {
-  background: rgba(30, 30, 40, 0.35);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(79, 81, 199, 0.28) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.brand {
-  font-weight: 700;
-  font-size: 20px;
-  letter-spacing: 0.5px;
-}
-
-.spacer {
-  flex: 1;
-}
-
-.right {
+/* Links/Brand */
+.left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
+.brand {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
 
+/* Rechts: Uhr + Registrieren ganz rechts */
+.right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Uhr */
 .time {
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  opacity: 0.95;
-  min-width: 52px;
-  text-align: right;
+  font-size: 1.4rem;
+  line-height: 1;
 }
 
-/* Buttons rechts */
+/* Button */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  padding: 6px 12px;
+  border: 2px solid #000;         /* schwarze Umrandung */
+  padding: 8px 14px;
   border-radius: 8px;
-  text-decoration: none;
+  background: #4f51c7;
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  box-shadow: 0 4px 12px rgba(79,81,199,0.35);
 }
 .btn:hover {
-  transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.09);
+  filter: brightness(1.06);
+  border-color: #000;             /* Rand bleibt schwarz beim Hover */
 }
-.btn.outline {
-  background: transparent;
+
+
+@media (max-width: 700px) {
+  .time { font-size: 1.2rem; }
+  .btn { padding: 6px 12px; }
 }

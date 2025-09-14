@@ -1,0 +1,55 @@
+<div class="page">
+  <div class="reg-card">
+    <h1>Konto erstellen</h1>
+
+    <div class="ok" *ngIf="ok">{{ ok }}</div>
+    <div class="msg" *ngIf="msg">{{ msg }}</div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="row">
+        <label>Vorname</label>
+        <input type="text" name="firstName" [(ngModel)]="firstName" />
+      </div>
+
+      <div class="row">
+        <label>Nachname</label>
+        <input type="text" name="lastName" [(ngModel)]="lastName" />
+      </div>
+
+      <div class="row">
+        <label>Geburtsjahr</label>
+        <input type="number" name="birthYear" [(ngModel)]="birthYear" />
+      </div>
+
+      <div class="row">
+        <label>E-Mail</label>
+        <input type="email" name="email" [(ngModel)]="email" autocomplete="email" />
+      </div>
+
+      <div class="row">
+        <label>Benutzername</label>
+        <input type="text" name="username" [(ngModel)]="username" autocomplete="username" />
+      </div>
+
+      <div class="row pw">
+        <label>Passwort</label>
+        <div class="input-wrap">
+          <input [type]="showPw ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="new-password" />
+          <button type="button" class="toggle" (click)="togglePw(1)">{{ showPw ? '🙈' : '👁️' }}</button>
+        </div>
+      </div>
+
+      <div class="row pw">
+        <label>Passwort (wiederholen)</label>
+        <div class="input-wrap">
+          <input [type]="showPw2 ? 'text' : 'password'" name="password2" [(ngModel)]="password2" autocomplete="new-password" />
+          <button type="button" class="toggle" (click)="togglePw(2)">{{ showPw2 ? '🙈' : '👁️' }}</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="submit" [disabled]="busy">{{ busy ? 'Bitte warten…' : 'Registrieren' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

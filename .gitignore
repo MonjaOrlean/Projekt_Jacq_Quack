@@ -1,0 +1,30 @@
+﻿# --- Node / Angular ---
+**/node_modules/
+.angular/
+dist/
+coverage/
+# Build/Cache/Temp
+.cache/
+.tmp/
+temp/
+tmp/
+
+# Logs
+logs/
+*.log
+
+# Editor/IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env (falls später verwendet)
+.env
+.env.*.local
+
+# Hinweis:
+# server/data/users.json NICHT ignorieren – bleibt versioniert!

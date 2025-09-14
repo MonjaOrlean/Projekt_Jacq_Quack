@@ -1,18 +1,10 @@
 <header class="bar" [class.solid]="onLogin" [class.glass]="!onLogin">
-  <div class="brand">Jacq-Quack-Quiz</div>
-
-  <div class="spacer"></div>
+  <div class="left">
+    <a class="brand" routerLink="/">Jacq-Quack-Quiz</a>
+  </div>
 
   <div class="right">
-    <span class="time">{{ time }}</span>
-
-    @if (onLogin) {
-      <!-- Auf Login-Seite: nur Registrieren rechts -->
-      <a class="btn" href="/login#register">Registrieren</a>
-    } @else {
-      <!-- Auf allen anderen Seiten: Abbrechen / Logout (wie zuvor) -->
-      <a class="btn" routerLink="/login">Abbrechen</a>
-      <a class="btn outline" routerLink="/login">Logout</a>
-    }
+    <span class="time">{{ timeStr }}</span>
+    <button *ngIf="onLogin" class="btn" (click)="openRegister()">Registrieren</button>
   </div>
 </header>

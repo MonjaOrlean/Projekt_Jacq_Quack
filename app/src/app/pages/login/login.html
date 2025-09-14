@@ -5,19 +5,40 @@
       <span class="school">Coding-Schule-Orlean</span>
     </h1>
 
-    <label>Benutzername</label>
-    <div class="input-wrap">
-      <input [(ngModel)]="username" type="text" placeholder="z. B. Monja" />
-    </div>
+    <!-- Meldung -->
+    <div class="msg" *ngIf="msg">{{ msg }}</div>
 
-    <label>Passwort</label>
-    <div class="input-wrap">
-      <input [(ngModel)]="password" [type]="showPw ? 'text' : 'password'" placeholder="••••••" />
-      <button class="pw-toggle" type="button" (click)="showPw = !showPw" title="Passwort ein-/ausblenden">👁️</button>
-    </div>
+    <form (ngSubmit)="onSubmit()">
+      <label>Benutzername</label>
+      <div class="input-wrap">
+        <input
+          type="text"
+          name="username"
+          [(ngModel)]="username"
+          placeholder="z. B. Monja"
+          autocomplete="username"
+        />
+      </div>
 
-    <div class="actions">
-      <button class="btn" type="button" (click)="doLogin()">Login</button>
-    </div>
+      <label>Passwort</label>
+      <div class="input-wrap">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="••••••"
+          autocomplete="current-password"
+        />
+        <button type="button" class="pw-toggle" (click)="togglePw()">
+          {{ showPassword ? '🙈' : '👁️' }}
+        </button>
+      </div>
+
+      <div class="actions">
+        <button class="btn" type="submit" [disabled]="loading">
+          {{ loading ? 'Bitte warten…' : 'Login' }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>

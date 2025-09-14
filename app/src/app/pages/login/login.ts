@@ -1,24 +1,45 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
+
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrls: ['./login.css'],
+  imports: [FormsModule, NgIf],
 })
 export class LoginComponent {
   username = '';
   password = '';
-  showPw = false;
+  showPassword = false;
+  loading = false;
+  msg = '';
+
+  constructor(private auth: AuthService, private router: Router) {}
 
   togglePw() {
-    this.showPw = !this.showPw;
+    this.showPassword = !this.showPassword;
   }
 
-  doLogin() {
-    // hier später die Login-Logik
-    console.log('login', this.username);
+  async onSubmit() {
+    this.msg = '';
+    if (!this.username || !this.password) {
+      this.msg = 'Bitte Benutzername und Passwort eingeben.';
+      return;
+    }
+
+    this.loading = true;
+    try {
+      await this.auth.login(this.username.trim(), this.password);
+      await this.router.navigateByUrl('/start');
+    } catch (e: any) {
+      this.msg = e?.message ?? 'Login fehlgeschlagen.';
+    } finally {
+      this.loading = false;
+    }
   }
 }

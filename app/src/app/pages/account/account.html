@@ -1,0 +1,24 @@
+<div class="wrap">
+  <div class="card">
+    <h2>Konto löschen</h2>
+
+    @if (!user) {
+      <p>Bitte zuerst einloggen.</p>
+    } @else {
+      @if (user.username.toLowerCase() === 'admin') {
+        <p><strong>Admin</strong>-Konto kann nicht gelöscht werden.</p>
+      } @else {
+        <p>
+          Das Löschen ist <strong>unwiderruflich</strong>. Gib zur Bestätigung deinen Benutzernamen ein:
+        </p>
+
+        <div class="row">
+          <input [(ngModel)]="confirmName" placeholder="{{ user.username }}" [disabled]="busy" />
+          <button class="btn danger" (click)="doDelete()" [disabled]="busy">Endgültig löschen</button>
+        </div>
+
+        @if (msg) { <div class="msg">{{ msg }}</div> }
+      }
+    }
+  </div>
+</div>

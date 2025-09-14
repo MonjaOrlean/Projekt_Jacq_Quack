@@ -1,32 +1,36 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, CommonModule],
   templateUrl: './header.html',
-  styleUrl: './header.css',
+  styleUrls: ['./header.css'],
+  imports: [RouterLink, NgIf]
 })
 export class Header implements OnDestroy {
-  now = new Date();
-  private t = setInterval(() => (this.now = new Date()), 1000);
+  private router = inject(Router);
 
-  constructor(private router: Router) {}
+  timeStr = this.formatTime(new Date());
+  private timer = setInterval(() => this.timeStr = this.formatTime(new Date()), 1000);
 
-  // Login-Seite? → volle Farbe, keine Ente
   get onLogin(): boolean {
     return this.router.url.startsWith('/login');
   }
 
-  get time(): string {
-    const hh = this.now.getHours().toString().padStart(2, '0');
-    const mm = this.now.getMinutes().toString().padStart(2, '0');
-    return `${hh}:${mm}`;
+  openRegister(): void {
+    // Login-Seite kann darauf hören und das Modal öffnen
+    window.dispatchEvent(new CustomEvent('open-register'));
   }
 
-  ngOnDestroy() {
-    clearInterval(this.t);
+  private formatTime(d: Date): string {
+    const h = String(d.getHours()).padStart(2, '0');
+    const m = String(d.getMinutes()).padStart(2, '0');
+    return `${h}:${m}`;
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.timer);
   }
 }

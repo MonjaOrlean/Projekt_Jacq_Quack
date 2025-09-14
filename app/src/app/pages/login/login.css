@@ -82,13 +82,45 @@ input::placeholder { color: rgba(255,255,255,0.65); }
 /* ===== Aktionen ===== */
 .actions { margin-top: 12px; display: flex; justify-content: center; }
 .btn {
-  border: 0; background: #4f51c7; color: #fff;
-  padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer;
+  border: 2px solid #000;         /* schwarze Umrandung */
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #4f51c7;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
   box-shadow: 0 4px 12px rgba(79,81,199,0.35);
 }
-.btn:hover { filter: brightness(1.06); }
+.btn:hover {
+  filter: brightness(1.06);
+  border-color: #000;             /* Rand bleibt schwarz beim Hover */
+}
+
 
 /* ===== Responsive Fallback ===== */
 @media (max-width: 700px) {
   :root { --login-width: 360px; --login-left-shift: -40px; --login-bottom: 24vh; }
 }
+
+/* ===== Registrieren-Modal ===== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+.modal {
+  width: min(520px, 92vw);
+  background: rgba(10, 10, 20, 0.85);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.45);
+}
+.modal h2 { margin: 0 0 10px; }

@@ -1,0 +1,26 @@
+.wrap { min-height: calc(100vh - 64px); display: grid; place-items: center; }
+.card {
+  width: min(560px, 92vw);
+  background: rgba(10,10,20,.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 10px 32px rgba(0,0,0,.3);
+  color: #fff;
+}
+h2 { margin: 0 0 10px; }
+.row { display: flex; gap: 10px; align-items: center; }
+input {
+  flex: 1 1 auto;
+  height: 36px; padding: 0 10px;
+  border-radius: 8px; border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.08); color: #fff;
+}
+.btn {
+  border: 0; border-radius: 8px; padding: 8px 14px;
+  font-weight: 700; cursor: pointer;
+}
+.btn.danger { background: #c43131; color:#fff; }
+.btn.danger:hover { filter: brightness(1.08); }
+.msg { margin-top: 10px; color: #ffd37a; }
