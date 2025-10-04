@@ -4,66 +4,81 @@ import { Injectable } from '@angular/core';
 export interface User {
   username: string;
   role: 'user' | 'admin';
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  birthYear?: number;
+  email?: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  /** aktuell eingeloggter User (oder null) */
-  public currentUser: User | null = null;
+  private STORAGE_KEY = 'jq_user';
+  private _user: User | null = null;
 
-  /** Login gegen die JSON-API */
+  constructor() {
+    // Session wiederherstellen
+    try {
+      const raw = sessionStorage.getItem(this.STORAGE_KEY);
+      if (raw) this._user = JSON.parse(raw);
+    } catch {}
+  }
+
+  // ---- Zustand / Getter -----------------------------------------------------
+  get currentUser(): User | null {
+    return this._user;
+  }
+
+  get isLoggedIn(): boolean {
+    return !!this._user;
+  }
+
+  // ---- Auth-Funktionen ------------------------------------------------------
   async login(username: string, password: string): Promise<void> {
-    const res = await fetch('/api/login', {
+    const res = await fetch('/api/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username: username?.trim(), password })
     });
 
-    if (!res.ok) {
-      // Fehlermeldung (falls vorhanden) aus dem Backend holen
-      let msg = 'Login fehlgeschlagen.';
-      try {
-        const j = await res.json();
-        if (j?.message) msg = j.message;
-      } catch {}
-      throw new Error(msg);
+    const text = await res.text();
+    let data: any = null;
+    try { data = text ? JSON.parse(text) : null; } catch {}
+
+    if (!res.ok || !data?.ok) {
+      throw new Error(data?.msg || `Login fehlgeschlagen (HTTP ${res.status})`);
     }
 
-    // Backend liefert z.B. { user: { ... } }
-    const data = await res.json();
-    this.currentUser = data.user as User;
+    this._user = data.user as User;
+    try { sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._user)); } catch {}
   }
 
   logout(): void {
-    this.currentUser = null;
+    this._user = null;
+    try { sessionStorage.removeItem(this.STORAGE_KEY); } catch {}
   }
 
-  /** Registrierung gegen die JSON-API */
-  async register(payload: {
-    username: string;
-    password: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    birthYear: number;
-  }): Promise<void> {
-    const res = await fetch('/api/register', {
-      method: 'POST',
+  /**
+   * Eigenes Konto löschen (wie von account.ts erwartet).
+   * Dein Backend akzeptiert DELETE /api/users/:username ohne Passwortprüfung.
+   * Wir schicken das Passwort trotzdem mit – falls du später serverseitig prüfst.
+   */
+  async deleteOwnAccount(password: string): Promise<void> {
+    if (!this._user?.username) {
+      throw new Error('Kein eingeloggter Benutzer.');
+    }
+
+    const res = await fetch(`/api/users/${encodeURIComponent(this._user.username)}`, {
+      method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ password })
     });
 
-    if (!res.ok) {
-      let msg = 'Registrierung fehlgeschlagen.';
-      try {
-        const j = await res.json();
-        if (j?.message) msg = j.message;
-      } catch {}
-      throw new Error(msg);
+    const text = await res.text();
+    let data: any = null;
+    try { data = text ? JSON.parse(text) : null; } catch {}
+
+    if (!res.ok || !data?.ok) {
+      throw new Error(data?.msg || `Löschen fehlgeschlagen (HTTP ${res.status})`);
     }
+
+    // Nach erfolgreichem Löschen direkt ausloggen
+    this.logout();
   }
 }

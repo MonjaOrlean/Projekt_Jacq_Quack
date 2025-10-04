@@ -7,18 +7,19 @@ import { Component, Input, OnDestroy } from '@angular/core';
   styleUrl: './avatar.css',
 })
 export class Avatar implements OnDestroy {
-  /** size kann Zahl (px) ODER CSS-String (z.B. "clamp(...)") sein */
-  @Input() size: number | string = 220;
+  /** Größe: Zahl (px) ODER CSS-String (z.B. "clamp(260px, 32vw, 820px)") */
+  @Input() size: number | string = 320;
 
-  // CSS-Wert für --size ableiten
+  /** CSS-Wert für --size ableiten */
   get sizeCss(): string {
     return typeof this.size === 'number' ? `${this.size}px` : this.size;
   }
 
+  /** Reihenfolge der Mund-Frames (transparentes PNG!) */
   private frames = [
-    '/img/avatar/jacq_closed.jpg',
-    '/img/avatar/jacq_half.jpg',
-    '/img/avatar/jacq_open.jpg',
+    '/img/avatar/jacq_closed.png',
+    '/img/avatar/jacq_half.png',
+    '/img/avatar/jacq_open.png',
   ];
   current = this.frames[0];
 
@@ -27,7 +28,7 @@ export class Avatar implements OnDestroy {
   private pulseTo?: number;
   talking = false;
 
-  /** Fallback-Animation (gleichmäßig), Dauer in ms */
+  /** Gleichmäßige Animation – optional beim Anklicken */
   startTalking(ms = 2400) {
     if (this.talking) return;
     this.talking = true;
@@ -39,7 +40,7 @@ export class Avatar implements OnDestroy {
     this.stopTo = window.setTimeout(() => this.stopTalking(), ms) as unknown as number;
   }
 
-  /** Stoppt Animation und geht auf Mund zu. */
+  /** Stoppt Animation und setzt Mund zu */
   stopTalking() {
     if (this.iv) { clearInterval(this.iv); this.iv = undefined; }
     if (this.stopTo) { clearTimeout(this.stopTo); this.stopTo = undefined; }
@@ -48,7 +49,7 @@ export class Avatar implements OnDestroy {
     this.talking = false;
   }
 
-  /** kurzer „Sprechimpuls“ – von TTS-Wortgrenzen aufgerufen */
+  /** Kurzer Impuls pro Wortgrenze (natürlichere Lippenbewegung) */
   pulse() {
     const idx = this.frames.indexOf(this.current);
     this.current = this.frames[(idx + 1) % this.frames.length];

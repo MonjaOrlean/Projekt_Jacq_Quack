@@ -5,30 +5,40 @@ import { Router } from '@angular/router';
   selector: 'app-result',
   standalone: true,
   templateUrl: './result.html',
-  styleUrl: './result.css',
+  styleUrls: ['./result.css'],
+  // keine imports nötig, wir verwenden im Template kein *ngIf
 })
-export class Result implements OnInit {
-  score = 0;
+export class ResultComponent implements OnInit {
+  correct = 0;
   total = 0;
-  percent = 0;
-  message = '';
 
   constructor(private router: Router) {}
 
-  ngOnInit(): void {
-    const s = Number(sessionStorage.getItem('quiz_score') ?? '0');
-    const t = Number(sessionStorage.getItem('quiz_total') ?? '0');
+  ngOnInit() {
+    // 1) bevorzugt: Navigation State
+    const nav = this.router.getCurrentNavigation();
+    const state = nav?.extras?.state as { correct: number; total: number } | undefined;
 
-    this.score = Number.isFinite(s) ? s : 0;
-    this.total = Number.isFinite(t) && t > 0 ? t : 10;
-    this.percent = Math.round((this.score / this.total) * 100);
-
-    if (this.percent >= 90) this.message = 'Mega! Bald ballerst du Prof-Niveau.';
-    else if (this.percent >= 70) this.message = 'Stark! Weiter so.';
-    else if (this.percent >= 50) this.message = 'Gut! Noch ein Durchgang?';
-    else this.message = 'Alles gut – beim nächsten Mal wird’s besser. 💪';
+    if (state && typeof state.correct === 'number' && typeof state.total === 'number') {
+      this.correct = state.correct;
+      this.total = state.total;
+    } else {
+      // 2) Fallback: SessionStorage
+      try {
+        const raw = sessionStorage.getItem('jq_result');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (typeof parsed?.correct === 'number') this.correct = parsed.correct;
+          if (typeof parsed?.total === 'number') this.total = parsed.total;
+        }
+      } catch {}
+    }
   }
 
-  restart() { this.router.navigateByUrl('/start'); }
-  logout()  { this.router.navigateByUrl('/credits'); }
+  retry() { this.router.navigateByUrl('/quiz'); }
+  backToStart() { this.router.navigateByUrl('/start'); }
+
+  get resultText() {
+    return `Du hast ${this.correct} von ${this.total} Fragen richtig beantwortet!`;
+  }
 }

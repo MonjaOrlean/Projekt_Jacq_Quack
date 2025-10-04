@@ -1,4 +1,4 @@
-// server/index.js  (ESM)
+// server/index.js (ESM)
 import express from 'express';
 import cors from 'cors';
 import { promises as fs } from 'fs';
@@ -27,7 +27,7 @@ async function saveUsers(users) {
   await fs.writeFile(DB_FILE, JSON.stringify(users, null, 2), 'utf-8');
 }
 
-// Seed: Admin darf nicht fehlen
+// Seed: Admin sicherstellen
 async function ensureAdmin() {
   const users = await loadUsers();
   const hasAdmin = users.some(u => (u.username ?? '').toLowerCase() === 'admin');
@@ -47,6 +47,15 @@ async function ensureAdmin() {
 }
 await ensureAdmin();
 
+// Info-Route für Root (nur Text, zum schnellen Check)
+app.get('/', (_req, res) => {
+  res
+    .type('text')
+    .send(
+      'User JSON backend alive. Endpoints: POST /api/users/register | /login | /recover | DELETE /api/users/:username'
+    );
+});
+
 // ---- API ----------------------------------------------------------
 app.post('/api/users/register', async (req, res) => {
   const { username, password, firstname, lastname, birthyear, email } = req.body ?? {};
@@ -63,7 +72,7 @@ app.post('/api/users/register', async (req, res) => {
 
   users.push({
     username: String(username),
-    password: String(password),
+    password: String(password), // Demo: Plaintext
     firstname: String(firstname),
     lastname: String(lastname),
     birthyear: Number(birthyear),
@@ -78,7 +87,9 @@ app.post('/api/users/login', async (req, res) => {
   const { username, password } = req.body ?? {};
   const users = await loadUsers();
   const user = users.find(
-    u => (u.username ?? '').toLowerCase() === String(username ?? '').toLowerCase() && u.password === password
+    u =>
+      (u.username ?? '').toLowerCase() === String(username ?? '').toLowerCase() &&
+      u.password === password
   );
   if (!user) return res.status(401).json({ ok: false, msg: 'Ungültige Zugangsdaten.' });
 
@@ -99,15 +110,14 @@ app.post('/api/users/recover', async (req, res) => {
       (u.email ?? '').toLowerCase() === String(email ?? '').toLowerCase()
   );
   if (!found) return res.json({ ok: false, msg: 'Keine passenden Daten gefunden.' });
-  // Demo: Zugangsdaten direkt zurückgeben
   res.json({ ok: true, username: found.username, password: found.password });
 });
 
-// >>> HIER: Konto löschen (Admin geschützt)
 app.delete('/api/users/:username', async (req, res) => {
   const param = String(req.params.username ?? '');
-  if (!param) return res.status(400).json({ ok: false, msg: 'Kein Benutzername angegeben.' });
+  const { password } = req.body ?? {};
 
+  if (!param) return res.status(400).json({ ok: false, msg: 'Kein Benutzername angegeben.' });
   if (param.toLowerCase() === 'admin') {
     return res.status(403).json({ ok: false, msg: 'Admin-Konto kann nicht gelöscht werden.' });
   }
@@ -116,11 +126,17 @@ app.delete('/api/users/:username', async (req, res) => {
   const idx = users.findIndex(u => (u.username ?? '').toLowerCase() === param.toLowerCase());
   if (idx === -1) return res.status(404).json({ ok: false, msg: 'Benutzer nicht gefunden.' });
 
+  // Optional: Passwort-Check
+  if (users[idx].password !== String(password ?? '')) {
+    return res.status(401).json({ ok: false, msg: 'Passwort falsch.' });
+  }
+
   users.splice(idx, 1);
   await saveUsers(users);
   res.json({ ok: true, msg: 'Konto unwiderruflich gelöscht.' });
 });
 
 // -------------------------------------------------------------------
-const PORT = process.env.PORT || 3001;
+// FEST auf Port 3001 stellen, um Verwechslungen zu vermeiden
+const PORT = 3001;
 app.listen(PORT, () => console.log(`User JSON backend läuft auf http://localhost:${PORT}`));

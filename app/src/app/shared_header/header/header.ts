@@ -1,36 +1,59 @@
-import { Component, OnDestroy, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+// src/app/shared_header/header/header.ts
+import { Component, inject, OnDestroy } from '@angular/core';
+import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
+import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   templateUrl: './header.html',
   styleUrls: ['./header.css'],
-  imports: [RouterLink, NgIf]
+  imports: [RouterLink, NgIf],
 })
-export class Header implements OnDestroy {
+export class HeaderComponent implements OnDestroy {
   private router = inject(Router);
+  private auth = inject(AuthService);
 
-  timeStr = this.formatTime(new Date());
-  private timer = setInterval(() => this.timeStr = this.formatTime(new Date()), 1000);
+  now = this.formatTime(new Date());
+  private t = setInterval(() => (this.now = this.formatTime(new Date())), 1000);
 
-  get onLogin(): boolean {
-    return this.router.url.startsWith('/login');
+  currentUrl = this.router.url;
+
+  // Logout-Modal
+  showLogoutConfirm = false;
+
+  constructor() {
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed())
+      .subscribe((e: any) => (this.currentUrl = e.urlAfterRedirects || e.url || this.router.url));
   }
 
-  openRegister(): void {
-    // Login-Seite kann darauf hören und das Modal öffnen
-    window.dispatchEvent(new CustomEvent('open-register'));
+  ngOnDestroy() { clearInterval(this.t); }
+
+  // Sichtbarkeiten
+  get isLogin(): boolean {
+    const u = this.currentUrl || '';
+    // nur auf /login die Registrieren-Schaltfläche zeigen
+    return u === '/login' || u.startsWith('/login');
   }
 
-  private formatTime(d: Date): string {
-    const h = String(d.getHours()).padStart(2, '0');
-    const m = String(d.getMinutes()).padStart(2, '0');
-    return `${h}:${m}`;
+  get isLoggedIn(): boolean {
+    return this.auth.isLoggedIn;
   }
 
-  ngOnDestroy(): void {
-    clearInterval(this.timer);
+  // Buttons oben rechts
+  openLogoutConfirm() { this.showLogoutConfirm = true; }
+  stayLoggedIn() { this.showLogoutConfirm = false; }
+  confirmLogout() {
+    try { this.auth.logout(); } catch {}
+    this.showLogoutConfirm = false;
+    this.router.navigateByUrl('/login');
+  }
+
+  private formatTime(d: Date) {
+    return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
   }
 }

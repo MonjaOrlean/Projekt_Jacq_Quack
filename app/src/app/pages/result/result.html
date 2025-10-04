@@ -1,19 +1,20 @@
-<div class="bg bg--schule">
-  <div class="page-shell">
-    <div class="card">
-      <h2>Ergebnis</h2>
+<div class="page">
+  <!-- Hintergrund -->
+  <img class="bg" src="img/Klassenzimmer.png" alt="Klassenzimmer" />
 
-      <p style="font-size:1.1rem; margin:.25rem 0 0;">
-        Deine Punktzahl:
-        <strong>{{ score }}</strong> / <strong>{{ total }}</strong>
-        (<strong>{{ percent }}%</strong>)
-      </p>
-      <p style="margin:.5rem 0 1rem;">{{ message }}</p>
+  <!-- Jacq (optional) -->
+  <div class="jacq">
+    <img src="img/avatar/jacq_closed.png" alt="Jacq" />
+  </div>
 
-      <div class="row">
-        <button class="btn primary" (click)="restart()">Nochmal ballern</button>
-        <button class="btn" (click)="logout()">Logout</button>
-      </div>
+  <!-- Ergebnis-Glaskarte (immer sichtbar, damit wir sofort sehen ob Werte kommen) -->
+  <div class="result-card">
+    <h1>Dein Ergebnis</h1>
+    <p>{{ resultText }}</p>
+
+    <div class="actions">
+      <button class="btn primary" (click)="retry()">Nochmal spielen</button>
+      <button class="btn ghost" (click)="backToStart()">Zurück zur Startseite</button>
     </div>
   </div>
 </div>

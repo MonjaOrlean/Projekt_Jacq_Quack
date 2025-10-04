@@ -1,24 +1,38 @@
-<div class="wrap">
-  <div class="card">
-    <h2>Konto löschen</h2>
+<!-- src/app/pages/account/account.html -->
+<div class="page">
+  <div class="card" *ngIf="user; else noUser">
+    <h1>Account löschen</h1>
+    <p>
+      <b>Angemeldet als:</b> {{ user.username }}<br />
+      {{ user.email }}
+    </p>
 
-    @if (!user) {
-      <p>Bitte zuerst einloggen.</p>
-    } @else {
-      @if (user.username.toLowerCase() === 'admin') {
-        <p><strong>Admin</strong>-Konto kann nicht gelöscht werden.</p>
-      } @else {
-        <p>
-          Das Löschen ist <strong>unwiderruflich</strong>. Gib zur Bestätigung deinen Benutzernamen ein:
-        </p>
+    <p>Zur Sicherheit bitte Benutzername & Passwort bestätigen.</p>
 
-        <div class="row">
-          <input [(ngModel)]="confirmName" placeholder="{{ user.username }}" [disabled]="busy" />
-          <button class="btn danger" (click)="doDelete()" [disabled]="busy">Endgültig löschen</button>
-        </div>
+    <label>
+      Benutzername bestätigen:
+      <input type="text" [(ngModel)]="confirmName" [placeholder]="user.username" />
+    </label>
 
-        @if (msg) { <div class="msg">{{ msg }}</div> }
-      }
-    }
+    <label>
+      Passwort:
+      <input type="password" [(ngModel)]="password" placeholder="••••••" />
+    </label>
+
+    <p class="msg ok" *ngIf="msg">{{ msg }}</p>
+    <p class="msg err" *ngIf="err">{{ err }}</p>
+
+    <div class="actions">
+      <button class="btn danger" (click)="onDelete()" [disabled]="busy || !canDelete">
+        {{ busy ? 'Lösche…' : 'Endgültig löschen' }}
+      </button>
+    </div>
   </div>
+
+  <ng-template #noUser>
+    <div class="card">
+      <h1>Nicht eingeloggt</h1>
+      <p>Bitte zuerst anmelden.</p>
+    </div>
+  </ng-template>
 </div>

@@ -1,101 +1,139 @@
-/* ===== Grundlayout ===== */
-.page {
-  min-height: calc(100vh - 56px);
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  box-sizing: border-box;
+/* ==== Fester Viewport unter 48px Navbar – kein Scrollen ==== */
+.page{
+  position: fixed;
+  top: 48px; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
+
+  /* ===== Feintuning-Variablen ===== */
+  /* Jacq (voller Körper) */
+  --jacq-left: 30vw;     /* Abstand vom linken Rand */
+  --jacq-bottom: -7vh;   /* feiner Bodenkontakt */
+  --jacq-height: 98vh;   /* Figurgröße */
+
+  /* Intro-Karte (rechts) */
+  --intro-right: 8vw;
+  --intro-top: 40vh;
+  --intro-width: 560px;
+
+  /* Vor-9-Uhr-Karte (links, neben Jacq) */
+  --before-left: 8vw;
+  --before-top: 42vh;
+  --before-width: 520px;
 }
 
-.shell { width: min(900px, 92vw); }
-
-.card{
-  background: rgba(0,0,0,.70);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,.35);
-  border-radius: .8rem;
-  padding: 1rem 1.25rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,.45);
+/* ==== Hintergrund: Vollflächig, unverrückbar ==== */
+.bg{
+  position: fixed;
+  top: 48px; left: 0;
+  width: 100vw; height: calc(100vh - 48px);
+  object-fit: cover; object-position: center;
+  user-select: none; pointer-events: none;
+  z-index: 0;
 }
 
-h2{ margin: .25rem 0 1rem; line-height: 1.25; }
-.ballern{ color: var(--brand, #4f51c7); text-shadow: 0 0 18px rgba(79,81,199,.45); }
-.JacqueLöhr{ color: var(--brand, #4f51c7); text-shadow: 0 0 18px rgba(79,81,199,.45);}
-.actions{ display:flex; gap:.75rem; margin-top: 1rem; }
-.btn{ display:inline-flex; align-items:center; justify-content:center; padding:.6rem 1.1rem; border-radius:.5rem; border:1px solid rgba(255,255,255,.35); background:transparent; color:#fff; text-decoration:none; cursor:pointer; }
-.btn:hover{ background: rgba(255,255,255,.06); }
-.btn.primary{ border-color: rgba(255,255,255,.65); background: var(--brand-ghost, rgba(79,81,199,.18)); }
-.btn.primary:hover{ background: var(--brand-hover, rgba(79,81,199,.28)); }
-
-/* Vor-9-Uhr Hinweis */
-.early{ background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.25); border-radius: .6rem; padding: .75rem 1rem; margin: .5rem 0 1rem; }
-.early-title{ font-weight: 700; margin-bottom: .25rem; color: #ffd685; }
-
-/* ===== Intro-Overlay (Kaminzimmer) ===== */
-.intro-bg{
-  position: fixed; inset: 0; z-index: 1100;
-  background:
-    linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.55)),
-    url('/img/Leherzimmer.png') center center / cover no-repeat;
+/* ==== Jacq: Vollkörper, am Boden, unverrückbar ==== */
+.jacq{
+  position: fixed;
+  left: var(--jacq-left);
+  bottom: var(--jacq-bottom);
+  z-index: 5;
+  user-select: none; pointer-events: none;
+}
+.jacq img{
+  height: var(--jacq-height);
+  width: auto; display: block;
+  object-fit: contain;
+  object-position: bottom center;
+  border-radius: 0; box-shadow: none;
 }
 
-/* Jacq neben dem Kamin „stehend“ */
-.jacq-stand{
-  position: absolute;
-  left: clamp(3vw, 12vw, 18vw);   /* Nähe Kamin an der linken Seite */
-  bottom: clamp(3vh, 7vh, 10vh);
-  z-index: 1110;
+/* ==== Karten-Basis (Glas-Look) ==== */
+.intro-card,
+.before-nine-card{
+  position: fixed;
+  width: min(92vw, 560px);
+  padding: 18px 22px;
+  border-radius: 14px;
+  color: #e9ecff;
+
+  background: rgba(10,10,20,.25);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 12px 36px rgba(0,0,0,.35);
+  z-index: 6;
+}
+.intro-card h1,
+.before-nine-card h3{ margin: 0 0 10px; color: #fff; }
+
+/* Intro-Karte: rechts */
+.intro-card{
+  right: var(--intro-right);
+  top: var(--intro-top);
+  transform: translateY(-50%);
+  width: min(var(--intro-width), 92vw);
 }
 
-/* Avatar im Raum: viel engerer Schnitt, kein Rahmen/Glow */
-.room-avatar .avatar{
-  --zoom: 1.28;   /* näher ran = weniger Original-Hintergrund */
-  --shiftY: -8%;
-  --rx: 30%;
-  --ry: 38%;
-  --cx: 50%;
-  --cy: 34%;
-}
-.room-avatar .avatar::after{ box-shadow: none; } /* keinen Kreisrahmen */
-.room-avatar .avatar img{
-  /* polygonaler Schnitt für „Körperform“ (ungefähr) */
-  clip-path: polygon(
-    45% 0%, 55% 0%,
-    62% 8%, 66% 16%, 66% 30%,
-    63% 44%, 62% 56%,
-    60% 78%, 58% 92%,
-    42% 92%, 40% 78%,
-    38% 56%, 37% 44%,
-    34% 30%, 34% 16%, 38% 8%
-  );
-  -webkit-mask-image: none;
-  mask-image: none;
-  border-radius: 0;
-  filter: drop-shadow(0 14px 32px rgba(0,0,0,.6));
+/* Vor-9-Uhr-Karte: links (neben Jacq) */
+.before-nine-card{
+  left: var(--before-left);
+  top: var(--before-top);
+  transform: translateY(-50%);
+  width: min(var(--before-width), 92vw);
 }
 
-/* Sprechkarte rechts */
-.speech-card{
-  position: absolute;
-  right: clamp(2vw, 6vw, 9vw);
-  top: clamp(8vh, 12vh, 16vh);
-  width: min(640px, 46vw);
-  background: rgba(0,0,0,.75);
-  border: 1px solid rgba(255,255,255,.35);
-  border-radius: .9rem;
-  padding: 1rem 1.25rem;
-  color: #fff;
-  z-index: 1110;
-  box-shadow: 0 10px 40px rgba(0,0,0,.6);
+/* Buttons */
+.actions{ margin-top:14px; display:flex; gap:10px; flex-wrap: wrap; }
+.btn{
+  border: 2px solid #000;         /* schwarze Umrandung */
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
 }
-.speech-card h3{ margin: 0 0 .5rem 0; }
-.speech-card .intro-text{ margin: .35rem 0; line-height: 1.5; font-size: 1.05rem; }
-.coderpuppe{ color: var(--brand, #4f51c7); font-weight: 800; text-shadow: 0 0 20px rgba(79,81,199,.45); }
-.intro-actions{ display:flex; gap:.6rem; margin-top: .6rem; }
-.no-sound-note{ opacity:.7; margin:.4rem 0 0; font-size:.9rem; }
+.btn.primary{
+  background:#4f51c7; color:#fff;
+  box-shadow:0 4px 12px rgba(79,81,199,.35);
+}
+.btn.primary:hover{ filter:brightness(1.06); }
+.btn.ghost{
+  background:transparent; color:#fff; border:2px solid #fff;
+}
+.btn.ghost:hover{ background:rgba(255,255,255,.1); }
 
-/* Responsive */
-@media (max-width: 980px){
-  .speech-card{ width: min(700px, 90vw); left: 50%; transform: translateX(-50%); right:auto; top: 10vh; }
-  .jacq-stand{ left: 50%; transform: translateX(-50%); bottom: 6vh; }
+/* ==== Logout-Modal (Glaskarte) ==== */
+.logout-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: grid; place-items: center;
+  z-index: 10000;
+}
+.logout-card{
+  width: min(560px, 92vw);
+  padding: 20px 24px;
+  border-radius: 14px;
+
+  color: #e9ecff;
+  background: rgba(10,10,20,.25);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 12px 36px rgba(0,0,0,.35);
+}
+.logout-card h2{ margin: 0 0 12px; color:#fff; }
+.logout-card .actions{ margin-top:12px; display:flex; gap:10px; justify-content:flex-end; }
+
+/* ==== Mobile Feinschliff ==== */
+@media (max-width: 700px){
+  .page{
+    --jacq-left: 4vw;
+    --jacq-bottom: 2vh;
+    --jacq-height: 48vh;
+
+    --intro-right: 4vw;
+    --intro-top: 45vh;
+    --intro-width: 380px;
+
+    --before-left: 4vw;
+    --before-top: 45vh;
+    --before-width: 360px;
+  }
 }

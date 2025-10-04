@@ -1,138 +1,129 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgIf } from '@angular/common';
-import { Avatar } from '../../shared/avatar/avatar';
 
 @Component({
   selector: 'app-start',
   standalone: true,
   templateUrl: './start.html',
-  styleUrl: './start.css',
-  imports: [RouterLink, NgIf, Avatar],
+  styleUrls: ['./start.css'],
+  imports: [NgIf],
 })
-export class Start implements OnInit, AfterViewInit {
-  // Vor-9-Uhr Hinweis
-  earlyWarn = false;
+export class StartComponent implements OnInit, OnDestroy {
+  // --- Hintergrund (für [src] im Template) ---
+  bgSrc = '/img/Lehrerzimmer.png';
 
-  // Intro-Overlay
-  showIntro = true;
+  // --- Jacq-Frames (Mund) ---
+  frames = [
+    '/img/avatar/jacq_closed.png',
+    '/img/avatar/jacq_half.png',
+    '/img/avatar/jacq_open.png',
+    '/img/avatar/jacq_half.png',
+  ];
+  private mouthTimer?: number;
+  frameIndex = 0;
 
-  // TTS
-  ttsAvailable = 'speechSynthesis' in window;
-  ttsBlocked = false;
-  speaking = false;
+  // --- Audio: Intro + Vor-9-Uhr ---
+  // URL-encode, falls Dateinamen Leerzeichen enthalten
+  private introUrl = encodeURI('/audio/Jacq Text Startseite.mp3');
+  private before9Url = encodeURI('/audio/Jacq text vor 9 Uhr.mp3');
+  private introAudio = new Audio(this.introUrl);
+  private before9Audio = new Audio(this.before9Url);
 
-  @ViewChild('introAv') introAv?: Avatar;
-
-  // responsive Größe für den Avatar (nutzt CSS clamp())
-  clampSize(minPx: number, vw: number, maxPx: number){
-    return `clamp(${minPx}px, ${vw}vw, ${maxPx}px)`;
+  // --- Vor 9 Uhr Logik ---
+  showBeforeNineModal = false;
+  private beforeNineKey = 'jq_before9_ack'; // wird auf '1' gesetzt, sobald bestätigt
+  private get isBeforeNine(): boolean {
+    const h = new Date().getHours();
+    return h < 9;
   }
+
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    const hour = new Date().getHours();
-    const alreadyWarned = sessionStorage.getItem('warned_before9') === '1';
-    this.earlyWarn = hour < 9 && !alreadyWarned;
-    this.showIntro = true;
-  }
-
-  ngAfterViewInit(): void {
-    setTimeout(() => this.speakIntroAuto(), 350);
-  }
-
-  dismissEarlyWarn() {
-    this.earlyWarn = false;
-    sessionStorage.setItem('warned_before9', '1');
-  }
-
-  closeIntro() {
-    this.stopSpeak();
-    this.showIntro = false;
-    this.introAv?.stopTalking();
-  }
-
-  // ===== Stimme auswählen: deutsch, männlich, möglichst natürlich =====
-  private pickNaturalGermanMale(): SpeechSynthesisVoice | null {
-    const voices = speechSynthesis.getVoices() || [];
-    const isDE = (v: SpeechSynthesisVoice) => (v.lang || '').toLowerCase().startsWith('de');
-    const de = voices.filter(isDE);
-
-    const preferNames = [
-      'Google Deutsch', 'Google de-DE',
-      'Microsoft Stefan', 'Microsoft Jonas', 'Microsoft Conrad', 'Microsoft Killian',
-      'Natural', 'Neural', 'Wavenet-B', 'Standard-B',
-    ];
-    const byName = (needle: string) =>
-      de.find(v => (v.name || '').includes(needle) || (v.voiceURI || '').includes(needle));
-    for (const n of preferNames) {
-      const hit = byName(n);
-      if (hit) return hit;
-    }
-
-    const maleish = /male|mann|stefan|jonas|conrad|killian|standard[- ]?b|wavenet[- ]?b|neural[- ]?b/i;
-    const localFirst = de.sort((a,b) => ((b as any).localService?1:0) - ((a as any).localService?1:0));
-    const male = localFirst.find(v => maleish.test((v.name||'') + ' ' + (v.voiceURI||'')));
-    return male || de[0] || voices[0] || null;
-  }
-
-  // ===== Gesprochener Text (AKTUALISIERT NACH DEINEM HTML) =====
-  private buildUtterance(): SpeechSynthesisUtterance {
-    const text =
-      // Tipp: „Schak“ hilft manchen Engines bei französischer Aussprache von "Jacques"
-      'Hallo zusammen! ' +
-      'Mein Name ist Jacques Löhr. ' +
-      'Für viele bin ich auch bekannt als: Jacques die Coder-Puppe. ' +
-      'Ich bin Dozent für deinen Programmierunterricht. ' +
-      'Bist du bereit, hier jetzt und sofort durchs Quiz zu ballern?';
-
-    const u = new SpeechSynthesisUtterance(text);
-
-    const voice = this.pickNaturalGermanMale();
-    if (voice) { u.voice = voice; u.lang = voice.lang || 'de-DE'; }
-    else { u.lang = 'de-DE'; }
-
-    // sanft, warm, natürlich
-    u.rate   = 0.95;  // etwas langsamer
-    u.pitch  = 1.02;  // leicht hell, aber nicht künstlich
-    u.volume = 0.98;
-
-    // Lippenbewegung an Wortgrenzen („natürlichere“ Animation)
-    u.onboundary = () => this.introAv?.pulse();
-
-    u.onstart = () => { this.speaking = true; this.introAv?.startTalking(8000); };
-    const stop = () => { this.speaking = false; this.introAv?.stopTalking(); };
-    u.onend = stop;
-    u.onerror = stop;
-
-    return u;
-  }
-
-  private speak(u: SpeechSynthesisUtterance) {
+    // Audio vorbereiten
     try {
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-      setTimeout(() => { if (!this.speaking) this.ttsBlocked = true; }, 900);
-    } catch { this.ttsBlocked = true; }
+      this.introAudio.preload = 'auto';
+      this.before9Audio.preload = 'auto';
+      this.introAudio.load();
+      this.before9Audio.load();
+    } catch {}
+
+    // Wenn es noch vor 9 Uhr ist und nicht bestätigt wurde → erst die Warnkarte
+    const ack = sessionStorage.getItem(this.beforeNineKey) === '1';
+    if (this.isBeforeNine && !ack) {
+      this.openBeforeNineCard();
+    } else {
+      this.playIntro();
+    }
   }
 
-  speakIntroAuto() {
-    if (!this.ttsAvailable) return;
-    if (speechSynthesis.getVoices().length === 0) {
-      const h = () => { speechSynthesis.onvoiceschanged = null; this.speak(this.buildUtterance()); };
-      speechSynthesis.onvoiceschanged = h;
-      setTimeout(() => { if (speechSynthesis.onvoiceschanged) h(); }, 500);
+  ngOnDestroy(): void {
+    this.stopMouth();
+    try { this.introAudio.pause(); } catch {}
+    try { this.before9Audio.pause(); } catch {}
+  }
+
+  // ===== Mund-Animation =====
+  private startMouth() {
+    this.stopMouth();
+    this.mouthTimer = window.setInterval(() => {
+      this.frameIndex = (this.frameIndex + 1) % this.frames.length;
+    }, 140);
+  }
+  private stopMouth() {
+    if (this.mouthTimer) {
+      clearInterval(this.mouthTimer);
+      this.mouthTimer = undefined;
+    }
+    this.frameIndex = 0;
+  }
+
+  // ===== Intro (normale Start-Ansage) =====
+  private playIntro() {
+    this.stopMouth();
+    try {
+      this.introAudio.currentTime = 0;
+      this.introAudio.onplay = () => this.startMouth();
+      this.introAudio.onended = () => this.stopMouth();
+      this.introAudio.play().catch(() => {});
+    } catch {}
+  }
+  repeatIntro() {
+    this.playIntro();
+  }
+
+  // ===== Vor 9 Uhr Karte =====
+  private openBeforeNineCard() {
+    this.showBeforeNineModal = true;
+    this.playBefore9();
+  }
+
+  playBefore9() {
+    // Vor-9-Uhr-Text abspielen
+    try {
+      this.before9Audio.currentTime = 0;
+      this.before9Audio.onplay = () => this.startMouth();
+      this.before9Audio.onended = () => this.stopMouth();
+      this.before9Audio.play().catch(() => {});
+    } catch {}
+  }
+
+  confirmBeforeNine() {
+    this.showBeforeNineModal = false;
+    try { sessionStorage.setItem(this.beforeNineKey, '1'); } catch {}
+    // Danach normales Intro sprechen lassen
+    this.playIntro();
+  }
+
+  // ===== Navigation =====
+  onStartClicked() {
+    // Falls jemand direkt startet, aber noch vor 9 Uhr + nicht bestätigt → Karte zeigen
+    const ack = sessionStorage.getItem(this.beforeNineKey) === '1';
+    if (this.isBeforeNine && !ack) {
+      this.openBeforeNineCard();
       return;
     }
-    this.speak(this.buildUtterance());
-  }
-
-  speakIntroManual() {
-    this.ttsBlocked = false;
-    this.speak(this.buildUtterance());
-  }
-
-  stopSpeak() {
-    try { speechSynthesis.cancel(); } catch {}
-    this.speaking = false;
+    this.router.navigateByUrl('/quiz');
   }
 }

@@ -1,10 +1,28 @@
-<header class="bar" [class.solid]="onLogin" [class.glass]="!onLogin">
-  <div class="left">
-    <a class="brand" routerLink="/">Jacq-Quack-Quiz</a>
-  </div>
+<!-- src/app/shared_header/header/header.html -->
+<header class="topbar">
+  <a class="brand" routerLink="/">Jacq-Quack-Quiz</a>
 
   <div class="right">
-    <span class="time">{{ timeStr }}</span>
-    <button *ngIf="onLogin" class="btn" (click)="openRegister()">Registrieren</button>
+    <span class="clock">{{ now }}</span>
+
+    <!-- Auf Login-Seite: Registrieren -->
+    <a *ngIf="isLogin" class="btn" routerLink="/register">Registrieren</a>
+
+    <!-- Auf allen anderen Seiten: Logout (nur wenn eingeloggt) -->
+    <ng-container *ngIf="!isLogin && isLoggedIn">
+      <button class="btn" (click)="openLogoutConfirm()">Logout</button>
+    </ng-container>
   </div>
 </header>
+
+<!-- Logout-Dialog -->
+<div class="modal-backdrop" *ngIf="showLogoutConfirm">
+  <div class="modal">
+    <h2>Wirklich ausloggen?</h2>
+    <p>Bei „Ja“ geht’s erst zum Abspann und danach automatisch zur Login-Seite.</p>
+    <div class="actions">
+      <button class="btn" (click)="stayLoggedIn()">Nein</button>
+      <button class="btn danger" (click)="confirmLogout()">Ja</button>
+    </div>
+  </div>
+</div>

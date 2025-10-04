@@ -1,34 +1,38 @@
-// src/app/app.routes.ts
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
     path: 'login',
     loadComponent: () =>
-      import('./pages/login/login').then(m => m.LoginComponent), // hier heißt die Klasse LoginComponent
+      import('./pages/login/login').then(m => m.LoginComponent),
   },
   {
     path: 'start',
     loadComponent: () =>
-      import('./pages/start/start').then(m => m.Start),           // NICHT StartComponent
+      import('./pages/start/start').then(m => m.StartComponent),
   },
   {
     path: 'quiz',
     loadComponent: () =>
-      import('./pages/quiz/quiz').then(m => m.Quiz),              // NICHT QuizComponent
+      import('./pages/quiz/quiz').then(m => m.QuizComponent),
   },
   {
     path: 'result',
     loadComponent: () =>
-      import('./pages/result/result').then(m => m.Result),        // NICHT ResultComponent
+      import('./pages/result/result').then(m => m.ResultComponent),
   },
   {
     path: 'credits',
     loadComponent: () =>
-      import('./pages/credits/credits').then(m => m.Credits),     // NICHT CreditsComponent
+      import('./pages/credits/credits').then(m => m.CreditsComponent),
+  },
+  {
+    path: 'register',
+    loadComponent: () =>
+      import('./pages/register/register').then(m => m.RegisterComponent),
   },
 
-  // Redirects
+  // Standard-Weiterleitungen
   { path: '', pathMatch: 'full', redirectTo: 'login' },
   { path: '**', redirectTo: 'login' },
 ];

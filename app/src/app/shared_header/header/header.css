@@ -1,82 +1,42 @@
-:host {
-  display: block;
+:root{ --brand:#4f51c7; }
+
+.topbar{
+  position: fixed; top:0; left:0; right:0; height:48px;
+  display:flex; align-items:center; gap:16px; padding:0 16px;
+  background:var(--brand); color:#fff; z-index:1000;
 }
 
-/* Grundlayout */
-.bar {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  color: #fff;
-}
+.brand{ font-weight:700; text-decoration:none; color:#fff; }
 
-/* Login-Seite: halbtransparent + leichter Glas-Effekt (erzwingen) */
-.bar.solid {
-  background: rgb(79, 81, 199) !important;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-}
+.right{ margin-left:auto; display:flex; gap:12px; align-items:center; }
+.clock{ opacity:.85; }
 
-/* Andere Seiten: noch transparenteres Glas */
-.bar.glass {
-  background: rgba(79, 81, 199, 0.28) !important;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+.btn{
+  background:#ffffff22; border:1px solid #ffffff44; color:#fff;
+  padding:6px 12px; border-radius:8px; cursor:pointer;
 }
+.btn:hover{ background:#ffffff33; }
+.btn.warn{ background:#c78a4f; }
+.btn.warn:hover{ filter:brightness(1.06); }
+.btn.danger{ background:#c74f4f; border-color:#ffffff66; }
+.btn.danger:hover{ filter:brightness(1.06); }
 
-/* Links/Brand */
-.left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+/* Modal */
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.45);
+  backdrop-filter:blur(2px); display:grid; place-items:center; z-index:2000;
 }
-.brand {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
+.modal{
+  width:min(560px,92vw); background:rgba(10,10,20,.92); color:#fff;
+  border:1px solid rgba(255,255,255,.2); border-radius:14px; padding:18px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45); text-align:center;
 }
-
-/* Rechts: Uhr + Registrieren ganz rechts */
-.right {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 14px;
+.modal .actions{ margin-top:12px; display:flex; gap:10px; justify-content:center; }
+.modal input{
+  width:100%; height:36px; margin-top:12px; padding:0 10px; border-radius:8px;
+  border:1px solid rgba(255,255,255,.25); background:rgba(255,255,255,.08); color:#fff;
 }
-
-/* Uhr */
-.time {
-  font-variant-numeric: tabular-nums;
-  font-size: 1.4rem;
-  line-height: 1;
-}
-
-/* Button */
-.btn {
-  border: 2px solid #000;         /* schwarze Umrandung */
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: #4f51c7;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(79,81,199,0.35);
-}
-.btn:hover {
-  filter: brightness(1.06);
-  border-color: #000;             /* Rand bleibt schwarz beim Hover */
-}
-
-
-@media (max-width: 700px) {
-  .time { font-size: 1.2rem; }
-  .btn { padding: 6px 12px; }
+.msg{
+  margin-top:8px; color:#ffebf0; background:rgba(255,76,76,.18);
+  border:1px solid rgba(255,76,76,.35); border-radius:8px; padding:8px 10px;
 }

@@ -1,46 +1,41 @@
 <div class="page">
-  <div class="shell">
-    <div class="card">
-      <h2>Bist du bereit, hier jetzt und sofort durchs Quiz zu <span class="ballern">BALLERN</span>?</h2>
+  <!-- Hintergrund -->
+  <img class="bg" [src]="bgSrc" alt="Lehrerzimmer" />
 
-      <div class="early" *ngIf="earlyWarn">
-        <div class="early-title">OHA, so früh!</div>
-        <p>Der Kopf ist doch erst ab <strong>9:00 Uhr</strong> arbeitsfähig 😴☕</p>
-        <button class="btn primary" (click)="dismissEarlyWarn()">Alles klar</button>
-      </div>
-
-      <div class="actions">
-        <a class="btn primary" routerLink="/quiz">Ja, lass uns losballern</a>
-        <a class="btn" routerLink="/login">Nein</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== INTRO-OVERLAY (Kaminzimmer mit freigestelltem Avatar) ===== -->
-<div class="intro-bg" *ngIf="showIntro">
-  <!-- Jacq „frei“ neben dem Kamin platzieren -->
-  <div class="jacq-stand">
-    <app-avatar #introAv class="room-avatar" [size]="clampSize(420, 26, 560)"></app-avatar>
+  <!-- Jacq Figur -->
+  <div class="jacq">
+    <img [src]="frames[frameIndex]" alt="Jacq" />
   </div>
 
-  <!-- Sprech-Card rechts -->
-  <div class="speech-card" role="dialog" aria-label="Vorstellung von Jacq">
-    <h3>Hallo zusammen!</h3>
-    <p class="intro-text">
-      Mein Name ist <strong class="JacquesLöhr">Jacques Löhr</strong>.
-      Für viele bin ich auch bekannt als <strong class="coderpuppe">Jacques die Coder-Puppe</strong> 
+  <!-- Intro-Glaskarte (rechts) – ausgeblendet, wenn Vor-9-Uhr aktiv -->
+  <div class="intro-card glass" *ngIf="!showBeforeNineModal">
+    <h1>Hallo zusammen!</h1>
+
+    <p><b>Mein Name ist Jacques Löhr.</b><br />
+      Für viele bin ich auch bekannt als <b>Jacques die Coder-Puppe</b>.<br />
       Ich bin Dozent für deinen Programmierunterricht.
     </p>
-    <p class="intro-text">
-      Bist du bereit, hier jetzt und sofort durchs Quiz zu <strong class="ballern">BALLERN</strong>?
-    </p>
 
-    <div class="intro-actions">
-      <button class="btn primary" (click)="closeIntro()">Klar, weiter!</button>
-      <button class="btn" *ngIf="ttsAvailable && ttsBlocked" (click)="speakIntroManual()">🔊 Vorlesen</button>
+    <p>Bist du bereit, hier jetzt und sofort durchs Quiz zu <b>BALLERN</b>?</p>
+
+    <div class="actions">
+      <button class="btn primary" (click)="onStartClicked()">Spiel starten</button>
+      <button class="btn ghost" (click)="repeatIntro()">Nochmal vorlesen</button>
     </div>
+  </div>
 
-    <p class="no-sound-note" *ngIf="ttsAvailable">(* Wird automatisch vorgelesen – falls blockiert, „🔊 Vorlesen“ klicken.)</p>
+  <!-- Vor-9-Uhr-Glaskarte (links) -->
+  <div class="before-nine-card glass" *ngIf="showBeforeNineModal">
+    <h3>Ist das dein scheiß Ernst?</h3>
+    <p>
+      Du willst ernsthaft vor 9:00 Uhr starten? So früh ist unser Programmiererhirn
+      noch nicht wirklich hochgefahren.<br /><br />
+      Aber wenn du unbedingt jetzt schon ballern willst, dann:<br />
+      Auf geht’s – hol dir einen Kaffee und dann geht es los!
+    </p>
+    <div class="actions">
+      <button class="btn ghost" (click)="playBefore9()">🔊 Vorlesen</button>
+      <button class="btn primary" (click)="confirmBeforeNine()">Okay, weiter!</button>
+    </div>
   </div>
 </div>

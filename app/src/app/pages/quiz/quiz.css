@@ -1,49 +1,165 @@
-/* Hintergrund: Hörsaal (aus public/img) */
-.bg {
-  min-height: calc(100vh - 56px);
-  background-size: cover;
-  background-position: center;
-}
-.bg--saal { background-image: url('/img/Klassenzimmer.png'); }
+/* ==== Fester Viewport – kein Scrollen unter 48px Navbar ==== */
+.page{
+  position: fixed;
+  top: 48px; left: 0; right: 0; bottom: 0;
+  overflow: hidden;
 
-/* Layout */
-.page-shell { display: grid; place-items: center; padding: 2rem; }
-.card {
-  background: rgba(0,0,0,.45);
-  border: 1px solid rgba(255,255,255,.25);
-  border-radius: .6rem;
-  padding: 1.25rem 1.5rem;
+  /* ===== Feintuning-Variablen ===== */
+  /* Jacq (links am Boden) */
+  --jacq-left: 10vw;
+  --jacq-bottom: -4vh;
+  --jacq-height: 75vh;
+
+  /* Karten (rechts) */
+  --card-right: 30vw;
+  --card-top: 50%;
+  --card-width: 520px;
+}
+
+/* ==== Hintergrund ==== */
+.bg{
+  position: fixed;
+  top: 48px; left: 0;
+  width: 100vw;
+  height: calc(100vh - 48px);
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==== Jacq ==== */
+.jacq{
+  position: fixed;
+  left: var(--jacq-left);
+  bottom: var(--jacq-bottom);
+  z-index: 5;
+}
+.jacq img{
+  height: var(--jacq-height);
+  width: auto;
+  display: block;
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+/* ==== Glas-Karten (Intro/Quiz) ==== */
+.glass{
+  background: rgba(25, 15, 10, 0.28);
+  border: 1px solid rgba(255,255,255,0.14);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 36px rgba(0,0,0,.35);
+  color: #e9ecff;
+  border-radius: 14px;
+}
+
+.intro-card,
+.quiz-card{
+  position: fixed;
+  right: var(--card-right);
+  top: var(--card-top);
+  transform: translateY(-50%);
+  width: min(var(--card-width), 92vw);
+  padding: 20px 22px;
+  z-index: 6;
+}
+
+.intro-card h1,
+.quiz-card h2{
+  margin: 0 0 12px;
+  line-height: 1.3;
   color: #fff;
-  max-width: 900px;
-  width: min(900px, 94vw);
 }
-.question {
-  font-size: clamp(1.1rem, 1.2vw + .6rem, 1.35rem);
-  margin: .25rem 0 1rem;
+
+.progress{
+  margin: 2px 0 10px;
+  font-size: 0.9rem;
+  color: #cfd3ff;
 }
-.grid {
-  margin-top: .25rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .75rem;
+
+/* ==== Antwortenliste ==== */
+.answers{
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
 }
-.btn {
-  padding: .75rem 1rem;
-  border-radius: .5rem;
-  border: 1px solid rgba(255,255,255,.35);
-  background: rgba(0,0,0,.25);
+.answers li{
+  margin: 6px 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
   color: #fff;
   cursor: pointer;
-  text-align: left;
+  transition: transform .06s ease, background .15s ease;
 }
-.btn:hover { background: rgba(255,255,255,.08); }
-.btn:disabled { opacity: .8; cursor: default; }
+.answers li:hover{
+  background: rgba(255,255,255,0.14);
+  transform: translateY(-1px);
+}
+.answers li.selected{ background: #3fa65d; border-color: #fff; }
+.answers li.userpick{ background: #8a2b2b; border-color: #ffcaca44; }
 
-/* Zustände */
-.btn.chosen { outline: 2px solid rgba(255,255,255,.6); }
-.btn.correct { border-color: #b7ffb7; background: rgba(0,255,128,.12); }
-.btn.wrong { border-color: #ffb4b4; background: rgba(255,0,0,.12); }
+/* Feedbackzeile */
+.feedback{
+  margin: 6px 0 0;
+  font-weight: 600;
+}
+.feedback .ok{ color: #b9ffd1; }
+.feedback .fail{ color: #ffd2d2; }
 
-.feedback { margin: .75rem 0; min-height: 1.5rem; }
-.row { display: flex; gap: .75rem; margin-top: .5rem; }
-.btn.primary { border-color:#c8ffd0; background: rgba(0,255,128,.12); }
+/* ==== Buttons ==== */
+.actions{
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+}
+.btn{
+  border: 2px solid #000;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn.primary{
+  background: #4f51c7;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(79,81,199,.35);
+}
+.btn.primary:hover{ filter: brightness(1.06); }
+
+/* Abbrechen immer nach rechts drücken */
+.btn.ghost{
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255,255,255,0.28);
+  margin-left: auto;
+}
+.btn.ghost:hover{
+  background: rgba(255,255,255,0.12);
+}
+
+/* ==== Abbrechen-Dialog ==== */
+.abort-backdrop{
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,0.35);
+  z-index: 99;
+}
+.abort-card{
+  width: min(560px, 92vw);
+  padding: 22px;
+}
+
+/* ==== Mobile ==== */
+@media (max-width: 700px){
+  .page{
+    --jacq-left: 4vw;
+    --jacq-bottom: 2vh;
+    --jacq-height: 48vh;
+    --card-right: 4vw;
+    --card-top: 45vh;
+    --card-width: 360px;
+  }
+}

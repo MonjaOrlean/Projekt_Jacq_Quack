@@ -2,33 +2,37 @@
 :host, .page {
   position: relative;
   display: block;
-  height: calc(100vh - 64px);
-  width: 100vw;              /* <- ergänzen für volle Breite */
+  height: 100vh;
+  width: 100vw;
   overflow: hidden;
   background: url('/img/Schule.png') center / cover no-repeat fixed;
 }
 
+/* ==== Variablen IM GLEICHEN SCOPE (wirksam!) ==== */
+/* -> HIER stellst du die Position bequem ein */
+.page {
+  --login-width: 325px;     /* Breite der Karte (schmaler gemacht) */
+  --login-left-shift: -52.0px;  /* nach links/rechts schieben */
+  --login-bottom: 40vh;     /* höher = weiter oben */
+}
 
-/* --- Zielposition über Variablen (fein justierbar) --- 
-   • --login-bottom: wie weit vom unteren Rand
-   • --login-left-shift: nach links (<0) / rechts (>0) schieben
-*/
 
 /* ===== Login-Karte (Glas-Optik, feste Position) ===== */
-.login-card {
-  position: fixed !important;
-  left: 38.3%;
-  bottom: var(--login-bottom);
-  transform: translate(calc(-50% + var(--login-left-shift)), 0);
+.page .login-card {
+  position: fixed;
+  left: 50%;
+  bottom: var(--login-bottom, 26vh); /* Fallback falls Variablen mal fehlen */
+  transform: translate(calc(-50% + var(--login-left-shift, 0px)), 0);
 
-  width: min(var(--login-width), 92vw);
+  width: min(var(--login-width, 520px), 92vw);
   padding: 22px;
   border-radius: 14px;
 
-  background: rgba(10, 10, 20, 0.10);        /* sehr transparent */
+  background: rgba(10, 10, 20, 0.10);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.14);
   box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+  z-index: 1;
 }
 
 /* ===== Überschrift ===== */
@@ -40,6 +44,16 @@
   text-align: center;
 }
 .login-card h1 .school { color: #cfd3ff; }
+
+/* ===== Info-/Fehlermeldungen ===== */
+.msg {
+  margin: 0 0 10px;
+  color: #ffebf0;
+  background: rgba(255, 76, 76, 0.18);
+  border: 1px solid rgba(255, 76, 76, 0.35);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
 
 /* ===== Felder ===== */
 label {
@@ -57,7 +71,7 @@ input[type='email'] {
   width: 100%;
   box-sizing: border-box;
   height: 34px;
-  padding: 0 42px 0 10px;              /* Platz für das Auge */
+  padding: 0 42px 0 10px;   /* Platz fürs Auge */
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.25);
   background: rgba(255,255,255,0.08);
@@ -93,13 +107,16 @@ input::placeholder { color: rgba(255,255,255,0.65); }
 }
 .btn:hover {
   filter: brightness(1.06);
-  border-color: #000;             /* Rand bleibt schwarz beim Hover */
+  border-color: #000;
 }
-
 
 /* ===== Responsive Fallback ===== */
 @media (max-width: 700px) {
-  :root { --login-width: 360px; --login-left-shift: -40px; --login-bottom: 24vh; }
+  .page {
+    --login-width: 360px;
+    --login-left-shift: 0px;
+    --login-bottom: 24vh; /* auf kleineren Screens etwas höher */
+  }
 }
 
 /* ===== Registrieren-Modal ===== */
@@ -113,7 +130,6 @@ input::placeholder { color: rgba(255,255,255,0.65); }
   justify-content: center;
   z-index: 1100;
 }
-
 .modal {
   width: min(520px, 92vw);
   background: rgba(10, 10, 20, 0.85);
