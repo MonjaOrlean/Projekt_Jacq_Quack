@@ -1,61 +1,64 @@
 import { Injectable } from '@angular/core';
 
-export type SoundKey =
-  | 'quizIntro'
-  | 'happy'
-  | 'angry'
-  | 'click';
+/**
+ * Einheitlicher Audio-Service:
+ * - playWithHandle(key): startet eine Audio-Datei und gibt das HTMLAudioElement zurück
+ * - playEffect('ok'|'fail'): spielt kurzes Quack (happy/angry)
+ * - stopAll(): stoppt ALLE gerade laufenden Sounds dieses Services
+ *
+ * Pfade passen zu /app/public/audio/...
+ */
+type AudioKey = 'quizIntro' | 'duckHappy' | 'duckAngry';
 
 @Injectable({ providedIn: 'root' })
 export class AudioService {
-  private audios = new Map<SoundKey, HTMLAudioElement>();
+  private current?: HTMLAudioElement;
 
-  constructor() {
-    // Pfade: liegen bei dir unter /public/audio/...
-    this.audios.set('quizIntro', new Audio('/audio/quiz_intro.mp3'));
-    this.audios.set('happy',    new Audio('/audio/ente_happy.mp3'));
-    this.audios.set('angry',    new Audio('/audio/ente_angry.mp3'));
-    this.audios.set('click',    new Audio('/audio/ente_neutral.mp3'));
-
-    this.audios.forEach(a => {
-      a.preload = 'auto';
-      a.volume  = 1;
-    });
-  }
-
-  /** Spielt einen Sound. Stoppt vorher alle. */
-  public play(key: SoundKey): Promise<void> {
-    this.stopAll();
-    const a = this.audios.get(key);
-    if (!a) return Promise.resolve();
-    try {
-      a.currentTime = 0;
-      return a.play().catch(() => {});
-    } catch { return Promise.resolve(); }
-  }
+  private srcMap: Record<AudioKey, string> = {
+    quizIntro: '/audio/quiz_intro.mp3',
+    duckHappy: '/audio/ente_happy.mp3',
+    duckAngry: '/audio/ente_angry.mp3',
+  };
 
   /**
-   * Spielt einen Sound und gibt das HTMLAudioElement zurück,
-   * damit der Aufrufer auf 'ended' hören kann.
+   * Startet Audio anhand Schlüssel und gibt das HTMLAudioElement zurück (oder null).
+   * Vorher werden laufende Audios dieses Services gestoppt.
    */
-  public playWithHandle(key: SoundKey): HTMLAudioElement | null {
+  playWithHandle(key: AudioKey): HTMLAudioElement | null {
+    const src = this.srcMap[key];
+    if (!src) return null;
+
     this.stopAll();
-    const a = this.audios.get(key) ?? null;
-    if (!a) return null;
+
     try {
-      a.currentTime = 0;
+      const a = new Audio(src);
+      a.volume = 1;
       a.play().catch(() => {});
-    } catch {}
-    return a;
+      this.current = a;
+      return a;
+    } catch {
+      return null;
+    }
   }
 
-  /** Stoppt *alle* Audios sofort. */
-  public stopAll(): void {
-    this.audios.forEach(a => {
-      try {
-        a.pause();
-        a.currentTime = 0;
-      } catch {}
-    });
+  /** Kurzer Effekt für Quiz-Feedback */
+  playEffect(kind: 'ok' | 'fail'): void {
+    const key: AudioKey = kind === 'ok' ? 'duckHappy' : 'duckAngry';
+    this.playWithHandle(key);
+  }
+
+  /** Stoppt das aktuell im Service laufende Audio (falls vorhanden). */
+  stopAll(): void {
+    try {
+      if (this.current) {
+        this.current.pause();
+        this.current.currentTime = 0;
+        this.current.src = '';
+        this.current.load();
+        this.current = undefined;
+      }
+    } catch {
+      /* noop */
+    }
   }
 }

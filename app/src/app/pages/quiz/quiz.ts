@@ -3,9 +3,23 @@ import { Router } from '@angular/router';
 import { NgIf, NgFor } from '@angular/common';
 import { AudioService } from '../../shared/services/audio.service';
 
+interface RawQuestion {
+  id: string;
+  topic: string;
+  text: string;
+  answers: string[];
+  correct: number;
+}
+
 interface Answer {
   text: string;
   correct: boolean;
+}
+
+interface Question {
+  id: string;
+  text: string;
+  answers: Answer[];
 }
 
 @Component({
@@ -19,30 +33,38 @@ export class QuizComponent implements OnInit, OnDestroy {
   // Intro-Glaskarte
   askCoffee = true;
 
-  // Abbrechen-Modal („feige Ente?“)
+  // Abbrechen-Modal
   showAbort = false;
 
-  // Avatar-Frames (Mundbewegung)
+  // Avatar-Frames (Mundbewegung NUR während Intro)
   frames = ['/img/avatar/jacq_closed.png', '/img/avatar/jacq_half.png', '/img/avatar/jacq_open.png'];
   idx = 0;
-  private talkTimer?: number;     // setInterval Handle
-  private talking = false;        // Zustand
+  private talkTimer?: number;
+  private talking = false;
 
-  // Frage/Daten
+  // Fragen/Daten
+  private all: Question[] = [];
+  private loaded = false;
+  private qIndex = 0;
+
   current: { text: string } | null = null;
   answers: Answer[] = [];
   correctIdx = -1;
+
   selected: number | null = null;
   showFeedback = false;
   lastWasCorrect = false;
   msg = '';
   progressLabel = '';
 
+  correctCount = 0;
+  totalCount = 0;
+
   constructor(private router: Router, private audio: AudioService) {}
 
   // ====== Lebenszyklus ======
-  ngOnInit(): void {
-    // Beim Aufruf Intro automatisch vorlesen lassen (wenn Autoplay erlaubt)
+  async ngOnInit(): Promise<void> {
+    // Intro automatisch vorlesen (wenn Autoplay erlaubt)
     if (this.askCoffee) {
       const handle = this.audio.playWithHandle('quizIntro');
       if (handle) {
@@ -61,14 +83,14 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.stopTalking();
   }
 
-  // ====== Avatar reden lassen ======
+  // ====== Intro / Jacq-Bewegung ======
   private startTalking() {
     if (this.talking) return;
     this.talking = true;
+    // entschleunigte Mundanimation
     this.talkTimer = window.setInterval(() => {
-      // 0 -> 1 -> 2 -> 1 -> 0 ...
       this.idx = (this.idx + 1) % this.frames.length;
-    }, 120);
+    }, 320);
   }
 
   private stopTalking() {
@@ -82,11 +104,17 @@ export class QuizComponent implements OnInit, OnDestroy {
   }
 
   // ====== Intro-Buttons ======
-  startQuiz() {
+  async startQuiz() {
     this.askCoffee = false;
     this.audio.stopAll();
     this.stopTalking();
-    this.loadQuestion();
+
+    this.correctCount = 0;
+    this.qIndex = 0;
+    this.selected = null;
+    this.showFeedback = false;
+
+    await this.loadQuestion();
   }
 
   replayIntro() {
@@ -113,42 +141,95 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.stopTalking();
     this.showAbort = true;
   }
-
   closeAbort() {
     this.showAbort = false;
   }
-
   confirmAbort() {
     this.audio.stopAll();
     this.stopTalking();
     this.router.navigateByUrl('/start');
   }
 
-  // ====== Antworten/Nächste ======
+  // ====== Fragen laden/anzeigen ======
+  private async ensureLoaded() {
+    if (this.loaded) return;
+    const raw = await fetch('/questions.json', { cache: 'no-store' }).then(r => r.json()) as RawQuestion[];
+
+    this.all = raw.map(q => this.toQuestion(q));
+    this.totalCount = this.all.length;
+
+    // Optional: Reihenfolge der Fragen leicht mischen
+    for (let i = this.all.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.all[i], this.all[j]] = [this.all[j], this.all[i]];
+    }
+
+    this.loaded = true;
+  }
+
+  private toQuestion(q: RawQuestion): Question {
+    const answers: Answer[] = q.answers.map((text, i) => ({ text, correct: i === q.correct }));
+    // Antworten pro Frage mischen
+    for (let i = answers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [answers[i], answers[j]] = [answers[j], answers[i]];
+    }
+    return { id: q.id, text: q.text, answers };
+  }
+
+  private setCurrentFromIndex() {
+    const q = this.all[this.qIndex];
+    this.current = { text: q.text };
+    this.answers = q.answers;
+    this.correctIdx = this.answers.findIndex(a => a.correct);
+    this.updateProgress();
+  }
+
+  private updateProgress() {
+    this.progressLabel = this.totalCount
+      ? `${Math.min(this.qIndex + 1, this.totalCount)} / ${this.totalCount}`
+      : '';
+  }
+
+  private async loadQuestion() {
+    await this.ensureLoaded();
+
+    if (this.qIndex >= this.all.length) {
+      // Ende -> Ergebnis-Seite
+      this.router.navigate(['/result'], {
+        queryParams: { c: this.correctCount, t: this.totalCount },
+      });
+      return;
+    }
+
+    this.setCurrentFromIndex();
+  }
+
+  // ====== Antworten / Nächste ======
   select(i: number) {
     if (this.showFeedback) return;
+
     this.selected = i;
     this.showFeedback = true;
     this.lastWasCorrect = this.answers[i]?.correct ?? false;
-    if (!this.lastWasCorrect) this.msg = '';
+
+    // Quack-Feedback
+    this.audio.stopAll();
+    if (this.lastWasCorrect) {
+      this.correctCount++;
+      this.audio.playEffect('ok');   // 🟢 happy quack
+    } else {
+      this.audio.playEffect('fail'); // 🔴 angry quack
+    }
   }
 
-  next() {
+  async next() {
+    if (!this.showFeedback) return;
+    this.audio.stopAll();
+
     this.selected = null;
     this.showFeedback = false;
-    this.loadQuestion();
-  }
-
-  // ====== Dummy-Frage (ersetze mit deiner JSON-Logik) ======
-  private loadQuestion() {
-    this.current = { text: 'Wie heißt die Hauptstadt von Frankreich?' };
-    this.answers = [
-      { text: 'Berlin', correct: false },
-      { text: 'Paris',  correct: true  },
-      { text: 'Rom',    correct: false },
-      { text: 'Madrid', correct: false },
-    ];
-    this.correctIdx = 1;
-    this.progressLabel = '1 / 10';
+    this.qIndex++;
+    await this.loadQuestion();
   }
 }
