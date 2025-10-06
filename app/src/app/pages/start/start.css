@@ -70,7 +70,7 @@
   right: var(--intro-right);
   top: var(--intro-top);
   transform: translateY(-50%);
-  width: min(var(--intro-width), 92vw);
+  width: min(var(--intro-width), 30vw);
 }
 
 /* Vor-9-Uhr-Karte: links (neben Jacq) */

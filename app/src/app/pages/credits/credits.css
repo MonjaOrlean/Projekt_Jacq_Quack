@@ -1,44 +1,68 @@
-.credits-wrapper {
-  min-height: 100vh;
-  background: url('/img/Leherzimmer.png') center/cover no-repeat fixed;
-  display: grid;
-  place-items: center;
-}
-
-.credits-overlay {
-  width: min(720px, 92vw);
-  height: min(70vh, 720px);
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 18px;
-  padding: 16px;
+/* Vollbild unter 48px Navbar – kein Scrollen */
+.page{
+  position: fixed;
+  top: 48px; left: 0; right: 0; bottom: 0;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  background: radial-gradient(1200px 600px at 50% 100%, #1a1a28 0%, #0e0e16 60%, #08080d 100%);
+  color: #e9ecff;
+  font-size: clamp(16px, 2.0vw, 20px);
 }
 
-.credits-window {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+/* Fade-Masken (oben/unten) */
+.fade{
+  position: absolute; left:0; right:0; height: 22%;
+  z-index: 2; pointer-events: none;
+}
+.fade.top{
+  top:0;
+  background: linear-gradient(to bottom, rgba(8,8,13,1), rgba(8,8,13,0));
+}
+.fade.bottom{
+  bottom:0;
+  background: linear-gradient(to top, rgba(8,8,13,1), rgba(8,8,13,0));
 }
 
-.credits-scroll {
-  position: absolute;
-  width: 100%;
-  bottom: -100%;
-  color: #f5f5f5;
+/* Rollender Text */
+.roll{
+  position: absolute; left: 50%;
+  transform: translateX(-50%);
+  width: min(760px, 92vw);
+  bottom: -40%;
+  z-index: 1;
+  text-align: left;
+  line-height: 1.6;
+
+  /* Tempo hierüber steuerbar: --roll-duration wird von TS gesetzt */
+  animation: rollUp var(--roll-duration, 60s) linear forwards;
+}
+
+.roll h2{
   text-align: center;
-  animation: roll 18s linear forwards;
-  padding: 0 18px;
+  letter-spacing: 2px;
+  margin: 0 0 24px;
+  color: #ffffff;
 }
 
-.credits-scroll h2 { margin: 18px 0 6px; font-size: 1.8rem; }
-.credits-scroll h3 { margin: 22px 0 8px; font-size: 1.3rem; }
-.credits-scroll p  { margin: 6px 0; line-height: 1.5; }
+.roll p{ margin: 12px 0; }
 
-@keyframes roll {
-  0%   { transform: translateY(100%); }
-  100% { transform: translateY(-110%); }
+/* Animation – von unten nach oben */
+@keyframes rollUp{
+  0%   { transform: translate(-50%, 0); }
+  100% { transform: translate(-50%, -180%); }
 }
+
+/* „Zum Login“-Button (unten rechts) */
+.skip{
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 3;
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  background: #4f51c7; color: #fff;
+  box-shadow: 0 8px 24px rgba(79,81,199,.35);
+  cursor: pointer;
+}
+.skip:hover{ filter: brightness(1.06); }

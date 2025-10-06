@@ -1,129 +1,145 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-start',
   standalone: true,
-  templateUrl: './start.html',
-  styleUrls: ['./start.css'],
   imports: [NgIf],
+  templateUrl: './start.html',
+  styleUrls: ['./start.css']
 })
 export class StartComponent implements OnInit, OnDestroy {
-  // --- Hintergrund (für [src] im Template) ---
   bgSrc = '/img/Lehrerzimmer.png';
+  onBgError() { this.bgSrc = '/assets/img/Lehrerzimmer.png'; }
 
-  // --- Jacq-Frames (Mund) ---
   frames = [
     '/img/avatar/jacq_closed.png',
     '/img/avatar/jacq_half.png',
     '/img/avatar/jacq_open.png',
     '/img/avatar/jacq_half.png',
   ];
+  frameIndex = signal(0);
+  speaking = signal(false);
   private mouthTimer?: number;
-  frameIndex = 0;
 
-  // --- Audio: Intro + Vor-9-Uhr ---
-  // URL-encode, falls Dateinamen Leerzeichen enthalten
-  private introUrl = encodeURI('/audio/Jacq Text Startseite.mp3');
-  private before9Url = encodeURI('/audio/Jacq text vor 9 Uhr.mp3');
-  private introAudio = new Audio(this.introUrl);
-  private before9Audio = new Audio(this.before9Url);
+  showBeforeNineModal = signal(false);
+  showWelcomeModal = signal(false);
 
-  // --- Vor 9 Uhr Logik ---
-  showBeforeNineModal = false;
-  private beforeNineKey = 'jq_before9_ack'; // wird auf '1' gesetzt, sobald bestätigt
-  private get isBeforeNine(): boolean {
-    const h = new Date().getHours();
-    return h < 9;
+  private BEFORE9_SRC = '/audio/Jacq text vor 9 Uhr.mp3';
+  private INTRO_SRC   = '/audio/Jacq Text Startseite.mp3';
+
+  private beforeNineAudio!: HTMLAudioElement;
+  private introAudio!: HTMLAudioElement;
+
+  constructor(private router: Router) {
+    this.ensureGlobalAudioKiller();
   }
 
-  constructor(private router: Router) {}
-
   ngOnInit(): void {
-    // Audio vorbereiten
-    try {
-      this.introAudio.preload = 'auto';
-      this.before9Audio.preload = 'auto';
-      this.introAudio.load();
-      this.before9Audio.load();
-    } catch {}
+    const hour = new Date().getHours();
 
-    // Wenn es noch vor 9 Uhr ist und nicht bestätigt wurde → erst die Warnkarte
-    const ack = sessionStorage.getItem(this.beforeNineKey) === '1';
-    if (this.isBeforeNine && !ack) {
-      this.openBeforeNineCard();
+    if (hour < 9) {
+      this.showBeforeNineModal.set(true);
+      this.showWelcomeModal.set(false);
+      this.playBefore9();
     } else {
+      this.showBeforeNineModal.set(false);
+      this.showWelcomeModal.set(true);
       this.playIntro();
     }
   }
 
   ngOnDestroy(): void {
+    this.stopAllAudio();
     this.stopMouth();
-    try { this.introAudio.pause(); } catch {}
-    try { this.before9Audio.pause(); } catch {}
   }
 
-  // ===== Mund-Animation =====
+  // === globaler Killer ===
+  private ensureGlobalAudioKiller() {
+    const w = window as any;
+    if (!w.jqAudios) w.jqAudios = new Set<HTMLAudioElement>();
+    if (!w.jqRegisterAudio) {
+      w.jqRegisterAudio = (a: HTMLAudioElement) => { w.jqAudios.add(a); return a; };
+    }
+    if (!w.jqHardStopAllAudio) {
+      w.jqHardStopAllAudio = () => {
+        try {
+          (w.jqAudios as Set<HTMLAudioElement>)?.forEach((a: HTMLAudioElement) => {
+            try {
+              a.pause();
+              a.muted = true;
+              a.removeAttribute('src');
+              a.load();
+            } catch {}
+          });
+          (w.jqAudios as Set<HTMLAudioElement>)?.clear();
+        } catch {}
+      };
+    }
+  }
+
+  private makeAudio(src: string): HTMLAudioElement {
+    const a = new Audio(encodeURI(src));
+    a.loop = false;
+    a.onplay = () => this.startMouth();
+    a.onpause = () => this.stopMouth();
+    a.onended = () => this.stopMouth();
+    (window as any).jqRegisterAudio?.(a);
+    return a;
+  }
+
+  private stopAllAudio() {
+    (window as any).jqHardStopAllAudio?.();
+  }
+
+  private async playBefore9() {
+    this.stopAllAudio();
+    this.beforeNineAudio = this.makeAudio(this.BEFORE9_SRC);
+    try { await this.beforeNineAudio.play(); } catch {}
+  }
+
+  private async playIntro() {
+    this.stopAllAudio();
+    this.introAudio = this.makeAudio(this.INTRO_SRC);
+    try { await this.introAudio.play(); } catch {}
+  }
+
+  repeatBefore9() { this.playBefore9(); }
+  repeatIntro()   { this.playIntro(); }
+
+  // Mund-Animation
   private startMouth() {
+    this.speaking.set(true);
     this.stopMouth();
     this.mouthTimer = window.setInterval(() => {
-      this.frameIndex = (this.frameIndex + 1) % this.frames.length;
+      this.frameIndex.set((this.frameIndex() + 1) % this.frames.length);
     }, 140);
   }
   private stopMouth() {
+    this.speaking.set(false);
     if (this.mouthTimer) {
       clearInterval(this.mouthTimer);
       this.mouthTimer = undefined;
     }
-    this.frameIndex = 0;
+    this.frameIndex.set(0);
   }
 
-  // ===== Intro (normale Start-Ansage) =====
-  private playIntro() {
-    this.stopMouth();
-    try {
-      this.introAudio.currentTime = 0;
-      this.introAudio.onplay = () => this.startMouth();
-      this.introAudio.onended = () => this.stopMouth();
-      this.introAudio.play().catch(() => {});
-    } catch {}
-  }
-  repeatIntro() {
-    this.playIntro();
-  }
-
-  // ===== Vor 9 Uhr Karte =====
-  private openBeforeNineCard() {
-    this.showBeforeNineModal = true;
-    this.playBefore9();
-  }
-
-  playBefore9() {
-    // Vor-9-Uhr-Text abspielen
-    try {
-      this.before9Audio.currentTime = 0;
-      this.before9Audio.onplay = () => this.startMouth();
-      this.before9Audio.onended = () => this.stopMouth();
-      this.before9Audio.play().catch(() => {});
-    } catch {}
-  }
-
+  // Aktionen
   confirmBeforeNine() {
-    this.showBeforeNineModal = false;
-    try { sessionStorage.setItem(this.beforeNineKey, '1'); } catch {}
-    // Danach normales Intro sprechen lassen
+    this.stopAllAudio();
+    this.showBeforeNineModal.set(false);
+    this.showWelcomeModal.set(true);
     this.playIntro();
   }
 
-  // ===== Navigation =====
   onStartClicked() {
-    // Falls jemand direkt startet, aber noch vor 9 Uhr + nicht bestätigt → Karte zeigen
-    const ack = sessionStorage.getItem(this.beforeNineKey) === '1';
-    if (this.isBeforeNine && !ack) {
-      this.openBeforeNineCard();
-      return;
-    }
-    this.router.navigateByUrl('/quiz');
+    this.stopAllAudio();
+    this.router.navigate(['/quiz']);
+  }
+
+  logout() {
+    this.stopAllAudio();
+    this.router.navigate(['/credits']);
   }
 }

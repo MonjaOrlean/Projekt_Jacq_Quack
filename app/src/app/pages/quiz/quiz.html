@@ -2,69 +2,61 @@
   <!-- Hintergrund -->
   <img class="bg" src="/img/Klassenzimmer.png" alt="Klassenzimmer" />
 
-  <!-- Jacq Figur (Mund animiert während Intro) -->
+  <!-- Jacq Figur -->
   <div class="jacq">
-    <img [src]="frames[frameIndex]" alt="Jacq" />
+    <img [src]="frames[idx]" alt="Jacq" />
   </div>
 
-  <!-- Intro-Glaskarte (vor dem Quiz) -->
-  <div class="intro-card glass" *ngIf="introVisible">
-    <h1>Quiz-Einleitung</h1>
+  <!-- Intro-Glaskarte -->
+  <div *ngIf="askCoffee" class="glass-card intro-card">
+    <h2>Quiz-Einleitung</h2>
     <p>
-      Hier bekommst du gleich <b>10 Fragen</b> aus verschiedenen Themen. Wähle die
-      richtige Antwort und zeig, was du drauf hast! Bist du bereit?
+      Hier bekommst du gleich 10 Fragen gestellt. Wähle die richtige Antwort – und
+      zeig, was du drauf hast! Bist du bereit zu zeigen was du kannst? Dann lass uns los BALLERN!
     </p>
+
     <div class="actions">
       <button class="btn primary" (click)="startQuiz()">Los geht’s!</button>
-      <button class="btn ghost" (click)="repeatIntro()">Nochmal vorlesen</button>
-      <button class="btn ghost" (click)="cancelFromIntro()">Abbrechen</button>
+      <button class="btn" (click)="replayIntro()">Nochmal vorlesen</button>
+      <button class="btn ghost" (click)="cancelQuiz()">Abbrechen</button>
     </div>
   </div>
 
-  <!-- Quiz-Glaskarte (wenn gestartet) -->
-  <div class="quiz-card glass" *ngIf="!introVisible && !finished && current">
-    <h2>{{ current.text }}</h2>
-    <p class="progress">{{ index + 1 }} / {{ total }}</p>
+  <!-- Quiz-Glaskarte -->
+  <div *ngIf="!askCoffee && current" class="glass-card quiz-card">
+    <h3>{{ current.text }}</h3>
+    <small>{{ progressLabel }}</small>
 
     <ul class="answers">
-      <li *ngFor="let a of current.answers; let i = index"
-          [class.selected]="answered && i === current.correct"
-          [class.userpick]="answered && i !== current.correct"
+      <li *ngFor="let a of answers; let i = index"
+          [class.selected]="selected === i"
           (click)="select(i)">
-        {{ a }}
+        {{ a.text }}
       </li>
     </ul>
 
-    <div class="feedback" *ngIf="answered">
-      <span *ngIf="isCorrect" class="ok">✅ Richtig!</span>
-      <span *ngIf="!isCorrect" class="fail">
-        ❌ Falsch. Richtig wäre: <b>{{ correctText }}</b>
+    <div class="feedback" *ngIf="showFeedback">
+      <span *ngIf="lastWasCorrect" class="ok">✅ Richtig!</span>
+      <span *ngIf="!lastWasCorrect" class="fail">
+        ❌ Falsch. Richtig wäre: <b>{{ answers[correctIdx].text }}</b>
       </span>
     </div>
 
-    <!-- Weiter erst nach Antwort + Quack -->
     <div class="actions">
-      <button class="btn primary" *ngIf="answered && quackDone" (click)="nextQuestion()">Weiter</button>
-      <button class="btn ghost" (click)="openAbort()">Abbrechen</button>
+      <button class="btn danger" (click)="openAbort()">Abbrechen</button>
+      <button class="btn primary" *ngIf="showFeedback" (click)="next()">Weiter</button>
     </div>
+
+    <p class="msg" *ngIf="msg">{{ msg }}</p>
   </div>
 
-  <!-- Ergebnis-Glaskarte -->
-  <div class="quiz-card glass" *ngIf="finished">
-    <h2>Geschafft!</h2>
-    <p>Du hast <b>{{ correctCount }}</b> von <b>{{ total }}</b> Fragen richtig beantwortet.</p>
-    <div class="actions">
-      <button class="btn primary" (click)="goResult()">Zum Ergebnis</button>
-    </div>
-  </div>
-
-  <!-- Abbrechen-Bestätigung -->
-  <div class="abort-backdrop" *ngIf="showAbort">
-    <div class="abort-card glass">
-      <h3>Willst du wirklich eine Feige Ente sein und jetzt schon kneifen?</h3>
+  <!-- Abbrechen-Modal -->
+  <div *ngIf="showAbort" class="modal-backdrop">
+    <div class="modal">
+      <h3>Willst du wirklich eine feige Ente sein und jetzt schon kneifen?</h3>
       <div class="actions">
-        <button class="btn primary" (click)="cancelAbort(false)">Keine feige Ente sein</button>
-        <button class="btn ghost" (click)="cancelAbort(true)">Feige Ente sein</button>
+        <button class="btn" (click)="closeAbort()">Keine feige Ente sein</button>
+        <button class="btn danger" (click)="confirmAbort()">Feige Ente sein</button>
       </div>
     </div>
   </div>

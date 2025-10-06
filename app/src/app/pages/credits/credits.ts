@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -7,20 +7,25 @@ import { Router } from '@angular/router';
   templateUrl: './credits.html',
   styleUrls: ['./credits.css'],
 })
-export class CreditsComponent implements OnInit {
-  /** Sekunden bis zur automatischen Weiterleitung */
-  durationSec = 22;
+export class CreditsComponent implements OnInit, OnDestroy {
+  private durationMs = 60000;
+  private timer?: number;
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    // Prüfen, ob wir von „Logout“ kommen (optional – zur Info/Styling)
-    const nav = this.router.getCurrentNavigation();
-    const after = (nav?.extras?.state as any)?.after;
+    // Beim Betreten der Credits ALLES endgültig abschießen
+    (window as any).jqHardStopAllAudio?.();
 
-    // Auto-Weiterleitung zur Login-Seite
-    setTimeout(() => {
-      this.router.navigateByUrl('/login');
-    }, this.durationSec * 1000);
+    document.documentElement.style.setProperty('--roll-duration', `${this.durationMs / 1000}s`);
+    this.timer = window.setTimeout(() => this.toLogin(), this.durationMs);
+  }
+
+  ngOnDestroy(): void {
+    if (this.timer) clearTimeout(this.timer);
+  }
+
+  toLogin(): void {
+    this.router.navigateByUrl('/login');
   }
 }

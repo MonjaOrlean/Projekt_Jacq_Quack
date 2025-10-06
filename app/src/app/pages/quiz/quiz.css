@@ -1,22 +1,21 @@
-/* ==== Fester Viewport – kein Scrollen unter 48px Navbar ==== */
+/* ==== Fester Viewport – kein Scrollen ==== */
 .page{
   position: fixed;
   top: 48px; left: 0; right: 0; bottom: 0;
   overflow: hidden;
 
-  /* ===== Feintuning-Variablen ===== */
-  /* Jacq (links am Boden) */
+  /* Jacq: Position & Größe */
   --jacq-left: 10vw;
   --jacq-bottom: -4vh;
   --jacq-height: 75vh;
 
-  /* Karten (rechts) */
+  /* Karten-Position */
   --card-right: 30vw;
   --card-top: 50%;
-  --card-width: 520px;
+  --card-width: 420px;
 }
 
-/* ==== Hintergrund ==== */
+/* Hintergrund */
 .bg{
   position: fixed;
   top: 48px; left: 0;
@@ -29,7 +28,7 @@
   z-index: 0;
 }
 
-/* ==== Jacq ==== */
+/* Jacq */
 .jacq{
   position: fixed;
   left: var(--jacq-left);
@@ -44,77 +43,70 @@
   object-position: bottom center;
 }
 
-/* ==== Glas-Karten (Intro/Quiz) ==== */
-.glass{
-  background: rgba(25, 15, 10, 0.28);
-  border: 1px solid rgba(255,255,255,0.14);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 12px 36px rgba(0,0,0,.35);
-  color: #e9ecff;
-  border-radius: 14px;
-}
-
-.intro-card,
-.quiz-card{
+/* Glas-Karten */
+.glass-card{
   position: fixed;
   right: var(--card-right);
   top: var(--card-top);
   transform: translateY(-50%);
   width: min(var(--card-width), 92vw);
-  padding: 20px 22px;
+
+  padding: 20px;
+  border-radius: 14px;
+  color: #e9ecff;
+
+  background: rgba(10, 10, 20, 0.25);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 12px 36px rgba(0,0,0,.35);
   z-index: 6;
 }
-
-.intro-card h1,
-.quiz-card h2{
+.glass-card h1, .glass-card h2{
   margin: 0 0 12px;
-  line-height: 1.3;
   color: #fff;
+  line-height: 1.3;
 }
 
 .progress{
-  margin: 2px 0 10px;
+  margin: 6px 0 10px;
   font-size: 0.9rem;
   color: #cfd3ff;
 }
 
-/* ==== Antwortenliste ==== */
+/* Antworten */
 .answers{
   list-style: none;
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   padding: 0;
 }
 .answers li{
   margin: 6px 0;
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: 8px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.18);
   color: #fff;
   cursor: pointer;
-  transition: transform .06s ease, background .15s ease;
 }
-.answers li:hover{
-  background: rgba(255,255,255,0.14);
-  transform: translateY(-1px);
-}
-.answers li.selected{ background: #3fa65d; border-color: #fff; }
-.answers li.userpick{ background: #8a2b2b; border-color: #ffcaca44; }
+.answers li:hover{ background: rgba(255,255,255,0.15); }
+.answers li.selected{ outline: 2px solid rgba(255,255,255,0.35); }
+.answers li.right{ background: rgba(66, 184, 131, .25); border-color: rgba(66,184,131,.6);}
+.answers li.wrong{ background: rgba(230, 69, 69, .25); border-color: rgba(230,69,69,.6); }
 
-/* Feedbackzeile */
-.feedback{
-  margin: 6px 0 0;
-  font-weight: 600;
-}
-.feedback .ok{ color: #b9ffd1; }
-.feedback .fail{ color: #ffd2d2; }
+/* Feedback */
+.feedback{ margin: 8px 0 6px; }
+.feedback .ok{ color: #a6ffcf; }
+.feedback .fail{ color: #ffb3b3; }
 
-/* ==== Buttons ==== */
+/* Buttons */
 .actions{
   margin-top: 14px;
   display: flex;
+  align-items: center;
   gap: 10px;
 }
+.spacer{ flex: 1; }
+
 .btn{
   border: 2px solid #000;
   padding: 8px 16px;
@@ -128,38 +120,40 @@
   box-shadow: 0 4px 12px rgba(79,81,199,.35);
 }
 .btn.primary:hover{ filter: brightness(1.06); }
-
-/* Abbrechen immer nach rechts drücken */
 .btn.ghost{
   background: transparent;
   color: #fff;
-  border-color: rgba(255,255,255,0.28);
-  margin-left: auto;
+  border-color: rgba(255,255,255,.35);
 }
-.btn.ghost:hover{
-  background: rgba(255,255,255,0.12);
-}
-
-/* ==== Abbrechen-Dialog ==== */
-.abort-backdrop{
-  position: fixed; inset: 0;
-  display: grid; place-items: center;
-  background: rgba(0,0,0,0.35);
-  z-index: 99;
-}
-.abort-card{
-  width: min(560px, 92vw);
-  padding: 22px;
+.btn.danger{
+  background: rgba(230, 69, 69, .85);
+  color: #fff;
 }
 
-/* ==== Mobile ==== */
+/* Abbrechen-Modal (Backdropp) */
+.modal-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20; /* über Karte */
+}
+.modal{
+  width: min(520px, 92vw);
+}
+
+/* Mobile */
 @media (max-width: 700px){
   .page{
     --jacq-left: 4vw;
     --jacq-bottom: 2vh;
     --jacq-height: 48vh;
+
     --card-right: 4vw;
     --card-top: 45vh;
-    --card-width: 360px;
+    --card-width: 380px;
   }
 }

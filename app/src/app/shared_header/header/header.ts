@@ -1,10 +1,7 @@
-// src/app/shared_header/header/header.ts
-import { Component, inject, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
 import { filter } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -14,43 +11,52 @@ import { AuthService } from '../../shared/services/auth.service';
   imports: [RouterLink, NgIf],
 })
 export class HeaderComponent implements OnDestroy {
-  private router = inject(Router);
-  private auth = inject(AuthService);
-
   now = this.formatTime(new Date());
   private t = setInterval(() => (this.now = this.formatTime(new Date())), 1000);
 
-  currentUrl = this.router.url;
+  currentUrl = '';
 
-  // Logout-Modal
   showLogoutConfirm = false;
+  deleteStep = 0;
 
-  constructor() {
+  constructor(private router: Router) {
+    this.currentUrl = this.router.url;
     this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd), takeUntilDestroyed())
+      .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((e: any) => (this.currentUrl = e.urlAfterRedirects || e.url || this.router.url));
   }
 
   ngOnDestroy() { clearInterval(this.t); }
 
-  // Sichtbarkeiten
+  // Login-Seite?
   get isLogin(): boolean {
     const u = this.currentUrl || '';
-    // nur auf /login die Registrieren-Schaltfläche zeigen
     return u === '/login' || u.startsWith('/login');
   }
 
-  get isLoggedIn(): boolean {
-    return this.auth.isLoggedIn;
+  // Von header.html verwendet
+  get hasUser(): boolean {
+    // Minimal-Variante: Zeige Logout/Account überall, außer auf /login
+    return !this.isLogin;
+    // Falls du echten Login-Zustand willst:
+    // return !!sessionStorage.getItem('jq_user');
   }
 
-  // Buttons oben rechts
-  openLogoutConfirm() { this.showLogoutConfirm = true; }
-  stayLoggedIn() { this.showLogoutConfirm = false; }
-  confirmLogout() {
-    try { this.auth.logout(); } catch {}
+  // --- Logout Flow ---
+  openLogoutConfirm() {
+    this.showLogoutConfirm = true;
+    document.dispatchEvent(new CustomEvent('jq-open-logout'));
+  }
+
+  stayLoggedIn() {
     this.showLogoutConfirm = false;
-    this.router.navigateByUrl('/login');
+    document.dispatchEvent(new CustomEvent('jq-cancel-logout'));
+  }
+
+  confirmLogout() {
+    document.dispatchEvent(new CustomEvent('jq-confirm-logout'));
+    this.showLogoutConfirm = false;
+    this.router.navigateByUrl('/credits'); // danach in credits.ts weiter zur /login
   }
 
   private formatTime(d: Date) {

@@ -1,21 +1,17 @@
-<!-- src/app/shared_header/header/header.html -->
 <header class="topbar">
   <a class="brand" routerLink="/">Jacq-Quack-Quiz</a>
 
   <div class="right">
     <span class="clock">{{ now }}</span>
 
-    <!-- Auf Login-Seite: Registrieren -->
-    <a *ngIf="isLogin" class="btn" routerLink="/register">Registrieren</a>
-
-    <!-- Auf allen anderen Seiten: Logout (nur wenn eingeloggt) -->
-    <ng-container *ngIf="!isLogin && isLoggedIn">
+    <!-- Logout nur, wenn ein User eingeloggt ist -->
+    <ng-container *ngIf="hasUser">
       <button class="btn" (click)="openLogoutConfirm()">Logout</button>
     </ng-container>
   </div>
 </header>
 
-<!-- Logout-Dialog -->
+<!-- Logout-Modal -->
 <div class="modal-backdrop" *ngIf="showLogoutConfirm">
   <div class="modal">
     <h2>Wirklich ausloggen?</h2>

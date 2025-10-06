@@ -1,20 +1,36 @@
 <div class="page">
-  <!-- Hintergrund -->
-  <img class="bg" [src]="bgSrc" alt="Lehrerzimmer" />
 
-  <!-- Jacq Figur -->
+  <!-- Hintergrund -->
+  <img class="bg" [src]="bgSrc" (error)="onBgError()" alt="Lehrerzimmer" />
+
+  <!-- Jacq Figur (animiert über frames[frameIndex()]) -->
   <div class="jacq">
-    <img [src]="frames[frameIndex]" alt="Jacq" />
+    <img [src]="frames[frameIndex()]" alt="Jacq" />
   </div>
 
-  <!-- Intro-Glaskarte (rechts) – ausgeblendet, wenn Vor-9-Uhr aktiv -->
-  <div class="intro-card glass" *ngIf="!showBeforeNineModal">
+  <!-- Vor-9-Uhr-Glaskarte (links neben Jacq) -->
+  <div *ngIf="showBeforeNineModal()" class="before-nine-card">
+    <h3>Ist das dein scheiß Ernst?</h3>
+    <p>
+      Du willst ernsthaft vor 9:00 Uhr starten? So früh ist unser Programmiererhirn
+      noch nicht wirklich hochgefahren.
+      <br><br>
+      Aber wenn du unbedingt jetzt schon ballern willst, dann:
+      Auf geht’s – hol dir einen Kaffee und dann geht es los!
+    </p>
+    <div class="actions">
+      <button class="btn" (click)="repeatBefore9()">Nochmal vorlesen</button>
+      <button class="btn primary" (click)="confirmBeforeNine()">Okay, Ballern ist angesagt!</button>
+    </div>
+  </div>
+
+  <!-- Normale Willkommenskarte (rechts) -->
+  <div *ngIf="showWelcomeModal()" class="intro-card">
     <h1>Hallo zusammen!</h1>
 
-    <p><b>Mein Name ist Jacques Löhr.</b><br />
-      Für viele bin ich auch bekannt als <b>Jacques die Coder-Puppe</b>.<br />
-      Ich bin Dozent für deinen Programmierunterricht.
-    </p>
+    <p><b>Mein Name ist Jacques Löhr.</b><br>
+       Für viele bin ich auch bekannt als <b>Jacques die Coder-Puppe</b>.<br>
+       Ich bin Dozent für deinen Programmierunterricht.</p>
 
     <p>Bist du bereit, hier jetzt und sofort durchs Quiz zu <b>BALLERN</b>?</p>
 
@@ -24,18 +40,4 @@
     </div>
   </div>
 
-  <!-- Vor-9-Uhr-Glaskarte (links) -->
-  <div class="before-nine-card glass" *ngIf="showBeforeNineModal">
-    <h3>Ist das dein scheiß Ernst?</h3>
-    <p>
-      Du willst ernsthaft vor 9:00 Uhr starten? So früh ist unser Programmiererhirn
-      noch nicht wirklich hochgefahren.<br /><br />
-      Aber wenn du unbedingt jetzt schon ballern willst, dann:<br />
-      Auf geht’s – hol dir einen Kaffee und dann geht es los!
-    </p>
-    <div class="actions">
-      <button class="btn ghost" (click)="playBefore9()">🔊 Vorlesen</button>
-      <button class="btn primary" (click)="confirmBeforeNine()">Okay, weiter!</button>
-    </div>
-  </div>
 </div>

@@ -1,12 +1,11 @@
-<div class="bg bg--kamin">
-  <div class="credits-wrap">
-    <!-- sanfte Fade-Masken -->
-    <div class="fade top"></div>
-    <div class="fade bottom"></div>
+<div class="page">
+  <!-- sanfte Fade-Masken -->
+  <div class="fade top"></div>
+  <div class="fade bottom"></div>
 
-    <!-- rollender Text -->
-    <div class="roll" role="document" aria-label="Abspann">
-      <h2>Abspann</h2>
+  <!-- rollender Text -->
+  <div class="roll" role="document" aria-label="Abspann">
+    <h2>Abspann</h2>
 
       <p></p>
 
@@ -36,5 +35,6 @@
         kannst. ;-)
       </p>
     </div>
-  </div>
+  <!-- Skip-Button, falls man nicht warten will -->
+  <button class="skip" (click)="toLogin()">Zum Login</button>
 </div>
